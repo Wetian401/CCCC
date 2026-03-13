@@ -215,6 +215,45 @@
             margin-bottom: 50px;
             opacity: 1;
         }
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3.5rem;
+                letter-spacing: 15px;
+                margin-right: -15px;
+            }
+            p.subtitle {
+                font-size: 1.2rem;
+                letter-spacing: 3px;
+                margin-top: 0;
+            }
+            header {
+                padding: 40px 10px 10px;
+            }
+            .container {
+                flex-direction: column;
+                gap: 40px;
+                padding-top: 20px;
+            }
+            .plant-btn {
+                width: 200px;
+                height: 200px;
+            }
+            .plant-name {
+                font-size: 1.6rem;
+                margin-top: 10px;
+            }
+            .bide-btn {
+                font-size: 1.1rem;
+                padding: 10px 25px;
+            }
+            #ai-float-btn {
+                width: 70px;
+                height: 70px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
     </style>
 </head>
 
@@ -230,21 +269,21 @@
     <div class="container">
         <div class="plant-item" onclick="window.location.href='graph.html?plant=plum'">
             <div class="plant-btn">
-                <img src="花草\Plum-Blossom-national-flower-of-china.jpg" alt="梅">
+                <img src="花草/Plum-Blossom-national-flower-of-china.jpg" alt="梅">
             </div>
             <div class="plant-name">梅</div>
         </div>
 
         <div class="plant-item" onclick="window.location.href='graph.html?plant=orchid'">
             <div class="plant-btn">
-                <img src="花草\a0737aee0dc3b2968dc8e5cd31df5c7a.png" alt="兰">
+                <img src="花草/a0737aee0dc3b2968dc8e5cd31df5c7a.png" alt="兰">
             </div>
             <div class="plant-name">兰</div>
         </div>
 
         <div class="plant-item" onclick="window.location.href='graph.html?plant=bamboo'">
             <div class="plant-btn">
-                <img src="花草\Phyllostachys-vivaxA-rotated.jpg" alt="竹">
+                <img src="花草/Phyllostachys-vivaxA-rotated.jpg" alt="竹">
             </div>
             <div class="plant-name">竹</div>
         </div>
