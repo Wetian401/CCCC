@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诗词植物意象交互图谱</title>
+    <style>
+        /* ================= 基础样式设计 ================= */
+        :root {
+            --bg-color: #f7f5f0;
+            /* 米宣纸色背景 */
+            --ink-color: #2c2c2c;
+            /* 水墨黑 */
+            --accent-color: #8a3b3b;
+            /* 胭脂红（强调色） */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "KaiTi", "STKaiti", "Georgia", serif;
+            background-color: var(--bg-color);
+            color: var(--ink-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 顶部标题栏 */
+        header {
+            text-align: center;
+            padding: 80px 20px 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title-group {
+            position: relative;
+            display: inline-block;
+            text-align: right;
+            /* 让内部的副标题靠右 */
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: normal;
+            letter-spacing: 40px;
+            /* 大胆拉开间距 */
+            font-size: 8rem;
+            /* 极致放大 */
+            color: #4a3b3b;
+            font-family: 'STXingkai', 'FZShuTi', 'KaiTi', serif;
+            text-shadow: 2px 4px 8px rgba(74, 59, 59, 0.2);
+            animation: fadeInDown 1.2s ease-out;
+            margin-right: -40px;
+            /* 抵消最后一个字的超大间距以居中 */
+            padding-bottom: 10px;
+        }
+
+        p.subtitle {
+            color: #8a3b3b;
+            font-size: 2.2rem;
+            margin-top: 5px;
+            letter-spacing: 6px;
+            /* 副标题间距重新收紧 */
+            font-family: 'KaiTi', serif;
+            display: block;
+            /* 占满整行方便右对齐 */
+            text-align: right;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-in 0.8s forwards;
+            padding-right: 0;
+            margin-right: -6px;
+            /* 抵消最后一个字的间距，实现真正的右侧边缘对齐 */
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 0.9;
+            }
+        }
+
+        /* ================= 主布局 ================= */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 100px;
+            /* 控制三个圆圈之间的间距 */
+            flex: 1;
+            /* 占据剩余全部高度，实现垂直居中 */
+        }
+
+        .plant-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        /* 鼠标悬停时整个项目轻微上浮 */
+        .plant-item:hover {
+            transform: translateY(-15px);
+        }
+
+        /* 圆形按钮样式 */
+        .plant-btn {
+            width: 320px;
+            /* 进一步放大图标尺寸 */
+            height: 320px;
+            border-radius: 50%;
+            border: 4px solid #d1d1d1;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: #fff;
+        }
+
+        .plant-item:hover .plant-btn {
+            border-color: var(--accent-color);
+            box-shadow: 0 8px 25px rgba(138, 59, 59, 0.4);
+        }
+
+        /* 探究比德传统按钮 */
+        .bide-btn-container {
+            text-align: center;
+            margin-top: 5vh;
+            margin-bottom: 2vh;
+            z-index: 10;
+        }
+
+        .bide-btn {
+            display: inline-block;
+            padding: 12px 36px;
+            background-color: var(--accent-color);
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.4rem;
+            border-radius: 40px;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 12px rgba(138, 59, 59, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bide-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .bide-btn:hover {
+            background-color: #6b2c2c;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(138, 59, 59, 0.5);
+            color: #fff;
+        }
+
+        .bide-btn:hover::before {
+            left: 100%;
+        }
+
+        /* 确保图片填满圆圈且不露底 */
+        .plant-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* 自动裁剪填充，不变形 */
+            display: block;
+        }
+
+        .plant-name {
+            margin-top: 25px;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--ink-color);
+            transition: color 0.3s ease;
+        }
+
+        .plant-item:hover .plant-name {
+            color: var(--accent-color);
+        }
+
+        /* 底部交互提示语 */
+        .interaction-hint {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #999;
+            letter-spacing: 4px;
+            margin-bottom: 50px;
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="title-group">
+            <h1>草木有本心</h1>
+            <p class="subtitle">——诗词中的植物人格图谱</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="plant-item" onclick="window.location.href='graph.html?plant=plum'">
+            <div class="plant-btn">
+                <img src="花草\Plum-Blossom-national-flower-of-china.jpg" alt="梅">
+            </div>
+            <div class="plant-name">梅</div>
+        </div>
+
+        <div class="plant-item" onclick="window.location.href='graph.html?plant=orchid'">
+            <div class="plant-btn">
+                <img src="花草\a0737aee0dc3b2968dc8e5cd31df5c7a.png" alt="兰">
+            </div>
+            <div class="plant-name">兰</div>
+        </div>
+
+        <div class="plant-item" onclick="window.location.href='graph.html?plant=bamboo'">
+            <div class="plant-btn">
+                <img src="花草\Phyllostachys-vivaxA-rotated.jpg" alt="竹">
+            </div>
+            <div class="plant-name">竹</div>
+        </div>
+    </div>
+
+    <!-- 比德传统入口 -->
+    <div class="bide-btn-container">
+        <a href="tradition.html" class="bide-btn">探究比德传统</a>
+    </div>
+
+    <!-- 交互提示语 -->
+    <div class="interaction-hint">点击上方植物，探索其文学内涵</div>
+
+    <script src="ai_assistant.js"></script>
+</body>
+
+</html>

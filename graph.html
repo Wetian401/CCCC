@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>植物意象图谱展示</title>
+    <style>
+        :root {
+            --bg-color: #f7f5f0;
+            --ink-color: #2c2c2c;
+            --accent-color: #8a3b3b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "KaiTi", "STKaiti", "Georgia", serif;
+            background-color: var(--bg-color);
+            color: var(--ink-color);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            border: 1px solid var(--ink-color);
+            text-decoration: none;
+            color: var(--ink-color);
+            border-radius: 30px;
+            transition: all 0.3s;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: var(--ink-color);
+            color: #fff;
+        }
+
+        #graphArea {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* 梅花图谱背景图 */
+        .bg-decor {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 35%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.35;
+            filter: blur(0.5px);
+        }
+
+        .bg-decor img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bg-left {
+            left: 0;
+        }
+
+        .bg-right {
+            right: 0;
+        }
+
+        #connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .center-node {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fcd556;
+            /* 类似黄色花蕊的颜色 */
+            font-size: 2.8rem;
+            text-shadow: 0 1px 3px rgba(138, 59, 59, 0.9);
+            /* 调整阴影适应黄色文字 */
+            /* 篆体 */
+            font-family: 'FZZJ-ZTXKJW', 'STZhuan', 'FZZhuanTi-S01S', 'LiSu', 'FZShuTi', cursive;
+            animation: fadeIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+        }
+
+        /* 真实的五瓣梅花形状 - 通过 SVG Mask 实现 */
+        .center-node::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #b33939;
+            /* 准确的有机五瓣花 SVG: 围绕中心均匀分布5片花瓣 */
+            -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='18'/%3E%3Ccircle cx='50' cy='22' r='22'/%3E%3Ccircle cx='50' cy='22' r='22' transform='rotate(72 50 50)'/%3E%3Ccircle cx='50' cy='22' r='22' transform='rotate(144 50 50)'/%3E%3Ccircle cx='50' cy='22' r='22' transform='rotate(216 50 50)'/%3E%3Ccircle cx='50' cy='22' r='22' transform='rotate(288 50 50)'/%3E%3C/svg%3E") center/contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='18'/%3E%3Ccircle cx='50' cy='22' r='22'/%3E%3Ccircle cx='50' cy='22' r='22' transform='rotate(72 50 50)'/%3E%3Ccircle cx='50' cy='22' r='22' transform='rotate(144 50 50)'/%3E%3Ccircle cx='50' cy='22' r='22' transform='rotate(216 50 50)'/%3E%3Ccircle cx='50' cy='22' r='22' transform='rotate(288 50 50)'/%3E%3C/svg%3E") center/contain no-repeat;
+            z-index: -1;
+        }
+
+        /* 兰花专用形状 - 优雅的兰叶交叉造型 */
+        .center-node.orchid-shape {
+            width: 130px;
+            height: 130px;
+            color: #e8dcc8;
+            text-shadow: 0 1px 3px rgba(59, 100, 59, 0.9);
+        }
+
+        .center-node.orchid-shape::before {
+            background: #4a7c59;
+            /* 兰叶向上簇拥造型：多片修长叶片从底部向上扇形展开，像皇冠/手掌 */
+            -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='30' y='65' width='60' height='35' rx='6'/%3E%3Cellipse cx='60' cy='38' rx='7' ry='32'/%3E%3Cellipse cx='60' cy='38' rx='7' ry='30' transform='rotate(-20 60 70)'/%3E%3Cellipse cx='60' cy='38' rx='7' ry='30' transform='rotate(20 60 70)'/%3E%3Cellipse cx='60' cy='40' rx='6' ry='28' transform='rotate(-40 60 70)'/%3E%3Cellipse cx='60' cy='40' rx='6' ry='28' transform='rotate(40 60 70)'/%3E%3C/svg%3E") center/contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='30' y='65' width='60' height='35' rx='6'/%3E%3Cellipse cx='60' cy='38' rx='7' ry='32'/%3E%3Cellipse cx='60' cy='38' rx='7' ry='30' transform='rotate(-20 60 70)'/%3E%3Cellipse cx='60' cy='38' rx='7' ry='30' transform='rotate(20 60 70)'/%3E%3Cellipse cx='60' cy='40' rx='6' ry='28' transform='rotate(-40 60 70)'/%3E%3Cellipse cx='60' cy='40' rx='6' ry='28' transform='rotate(40 60 70)'/%3E%3C/svg%3E") center/contain no-repeat;
+        }
+
+        .center-node.orchid-shape::after {
+            background: radial-gradient(circle, rgba(74, 124, 89, 0.3) 0%, rgba(44, 60, 44, 0.15) 30%, transparent 60%);
+        }
+
+        /* 竹子专用形状 - 仿手绘竹节与竹叶 */
+        .center-node.bamboo-shape {
+            width: 130px;
+            height: 130px;
+            color: #e8dcc8;
+            text-shadow: 0 1px 3px rgba(59, 100, 59, 0.9);
+        }
+
+        .center-node.bamboo-shape::before {
+            background: #5b8c5a;
+            /* 每组三叶从同一竹节处簇生散开，更修长自然 */
+            -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M45,10 L75,10 L73,42 L47,42 Z'/%3E%3Cpath d='M46,44 L74,44 L76,78 L44,78 Z'/%3E%3Cpath d='M43,80 L77,80 L75,115 L45,115 Z'/%3E%3Crect x='42' y='41' width='36' height='3' rx='1'/%3E%3Crect x='41' y='77' width='38' height='3' rx='1'/%3E%3Cpath d='M47,14 Q22,-2 5,5 Q24,12 47,16 Z'/%3E%3Cpath d='M47,14 Q18,10 2,18 Q20,22 47,17 Z'/%3E%3Cpath d='M47,15 Q22,18 8,30 Q24,28 47,18 Z'/%3E%3Cpath d='M73,49 Q98,34 115,38 Q96,46 73,51 Z'/%3E%3Cpath d='M73,49 Q100,46 116,52 Q98,56 73,52 Z'/%3E%3Cpath d='M73,50 Q96,54 112,64 Q94,62 73,53 Z'/%3E%3Cpath d='M76,85 Q100,72 116,76 Q98,84 76,87 Z'/%3E%3Cpath d='M76,85 Q102,84 118,90 Q100,94 76,88 Z'/%3E%3Cpath d='M76,86 Q98,92 114,104 Q96,100 76,89 Z'/%3E%3C/svg%3E") center/contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M45,10 L75,10 L73,42 L47,42 Z'/%3E%3Cpath d='M46,44 L74,44 L76,78 L44,78 Z'/%3E%3Cpath d='M43,80 L77,80 L75,115 L45,115 Z'/%3E%3Crect x='42' y='41' width='36' height='3' rx='1'/%3E%3Crect x='41' y='77' width='38' height='3' rx='1'/%3E%3Cpath d='M47,14 Q22,-2 5,5 Q24,12 47,16 Z'/%3E%3Cpath d='M47,14 Q18,10 2,18 Q20,22 47,17 Z'/%3E%3Cpath d='M47,15 Q22,18 8,30 Q24,28 47,18 Z'/%3E%3Cpath d='M73,49 Q98,34 115,38 Q96,46 73,51 Z'/%3E%3Cpath d='M73,49 Q100,46 116,52 Q98,56 73,52 Z'/%3E%3Cpath d='M73,50 Q96,54 112,64 Q94,62 73,53 Z'/%3E%3Cpath d='M76,85 Q100,72 116,76 Q98,84 76,87 Z'/%3E%3Cpath d='M76,85 Q102,84 118,90 Q100,94 76,88 Z'/%3E%3Cpath d='M76,86 Q98,92 114,104 Q96,100 76,89 Z'/%3E%3C/svg%3E") center/contain no-repeat;
+        }
+
+        .center-node.bamboo-shape::after {
+            background: radial-gradient(circle, rgba(91, 140, 90, 0.3) 0%, rgba(60, 90, 60, 0.15) 30%, transparent 60%);
+        }
+
+        .child-node {
+            position: absolute;
+            z-index: 5;
+            background: #fdfaf5;
+            /* 古风双线边框效果 */
+            border: 2px solid #8a3b3b;
+            outline: 1px solid #8a3b3b;
+            outline-offset: -6px;
+            padding: 16px 24px;
+            font-size: 1.25rem;
+            font-family: 'KaiTi', 'STKaiti', serif;
+            color: #4a3b3b;
+            max-width: 280px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(138, 59, 59, 0.15);
+            opacity: 0;
+            animation: expandOut 0.8s forwards;
+            transition: all 0.3s;
+            /* 纸张质感 */
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        .child-node::before,
+        .child-node::after {
+            content: var(--plant-icon, '✿');
+            position: absolute;
+            color: #8a3b3b;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        .child-node::before {
+            top: 2px;
+            left: 4px;
+        }
+
+        .child-node::after {
+            bottom: 2px;
+            right: 4px;
+        }
+
+        /* 中心节点的水墨呼吸晕染效果 */
+        .center-node::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 800%;
+            height: 800%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(138, 59, 59, 0.3) 0%, rgba(44, 44, 44, 0.15) 30%, transparent 60%);
+            border-radius: 50%;
+            z-index: -2;
+            pointer-events: none;
+            animation: inkPulse 5s ease-in-out infinite;
+        }
+
+        @keyframes inkPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.6);
+                opacity: 0.1;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(0.6);
+                opacity: 0.1;
+            }
+        }
+
+        .child-node:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background: #fffdf5;
+            z-index: 20;
+        }
+
+        .transition-text {
+            position: absolute;
+            text-align: center;
+            color: #8a3b3b;
+            font-family: 'KaiTi', 'STKaiti', serif;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+            animation: fadeIn 1.5s ease-in 1s forwards;
+            /* 延时1秒后缓慢淡入 */
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+        }
+
+        .type-quality {
+            border-color: #d4a017;
+            outline-color: #d4a017;
+        }
+
+        .type-quality .node-label,
+        .type-quality::before,
+        .type-quality::after {
+            color: #d4a017;
+        }
+
+        .type-poet {
+            border-color: #3b8a4d;
+            outline-color: #3b8a4d;
+        }
+
+        .type-poet .node-label,
+        .type-poet::before,
+        .type-poet::after {
+            color: #3b8a4d;
+        }
+
+        .type-verse {
+            border-color: #8a3b3b;
+            outline-color: #8a3b3b;
+            font-style: italic;
+        }
+
+        .type-verse .node-label,
+        .type-verse::before,
+        .type-verse::after {
+            color: #8a3b3b;
+        }
+
+        /* 针对支持自定义颜色的节点 */
+        .child-node.custom-color {
+            border-color: var(--node-color) !important;
+            outline-color: var(--node-color) !important;
+        }
+
+        .child-node.custom-color .node-label,
+        .child-node.custom-color::before,
+        .child-node.custom-color::after {
+            color: var(--node-color) !important;
+        }
+
+        /* 梅花图谱专用左右两侧不同深浅红色 */
+        .child-node.plum-left {
+            border-color: #d18d8d;
+            outline-color: #d18d8d;
+            color: #7a4343;
+        }
+        .child-node.plum-left .node-label,
+        .child-node.plum-left::before,
+        .child-node.plum-left::after {
+            color: #d18d8d;
+        }
+
+        .child-node.plum-right {
+            border-color: #8a3b3b;
+            outline-color: #8a3b3b;
+            color: #4a1d1d;
+        }
+        .child-node.plum-right .node-label,
+        .child-node.plum-right::before,
+        .child-node.plum-right::after {
+            color: #8a3b3b;
+        }
+
+        .node-label {
+            display: block;
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 4px;
+            text-align: left;
+            font-family: sans-serif;
+        }
+
+
+        @keyframes fadeIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes expandOut {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 梅花装饰动画 */
+        .plum-blossom {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            animation: floatBlossom 8s ease-in-out infinite;
+        }
+
+        @keyframes floatBlossom {
+            0% {
+                opacity: 0;
+                transform: translateY(0) rotate(0deg) scale(0.6);
+            }
+
+            15% {
+                opacity: 0.9;
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: translateY(-30px) rotate(180deg) scale(1.1);
+            }
+
+            85% {
+                opacity: 0.8;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) rotate(360deg) scale(0.8);
+            }
+        }
+
+        /* 竹叶飘落动画 */
+        .bamboo-leaf-anim {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes fallBambooLeaf {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            10% {
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: translate(var(--dx1), 40vh) rotate(180deg);
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx2), 110vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-btn">← 返回首页</a>
+
+    <div id="graphArea">
+        <svg id="connections">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#8a3b3b" />
+                </marker>
+            </defs>
+        </svg>
+        <!-- 节点由JS生成 -->
+    </div>
+
+    <script>
+        // 数据源
+        const knowledgeData = {
+            'plum': {
+                name: '梅',
+                nodes: [
+                    // 左侧（林逋 - 隐逸）
+                    { id: 'left_poet', type: 'poet', text: '林逋', side: 'left' },
+                    { id: 'left_quality', type: 'quality', text: '隐逸之姿', side: 'left' },
+                    { id: 'left_verse', type: 'verse', text: '疏影横斜水清浅，<br>暗香浮动月黄昏。', side: 'left' },
+                    // 右侧（陆游 - 志士）
+                    { id: 'right_poet', type: 'poet', text: '陆游', side: 'right' },
+                    { id: 'right_quality', type: 'quality', text: '志士之魂', side: 'right' },
+                    { id: 'right_verse', type: 'verse', text: '零落成泥碾作尘，<br>只有香如故。', side: 'right' }
+                ]
+            },
+            'bamboo': {
+                name: '竹',
+                nodes: [
+                    // 左侧（郑燮 - 坚韧）
+                    { type: 'poet', text: '郑燮', side: 'left', color: '#5b8c5a' },
+                    { type: 'verse', text: '千磨万击还坚劲，<br>任尔东西南北风。', side: 'left', color: '#5b8c5a' },
+                    { type: 'quality', text: '坚韧不拔', side: 'left', color: '#5b8c5a' },
+                    // 右侧（王维 - 虚静）
+                    { type: 'poet', text: '王维', side: 'right', color: '#6b7b3a' },
+                    { type: 'verse', text: '独坐幽篁里，<br>弹琴复长啸。', side: 'right', color: '#6b7b3a' },
+                    { type: 'quality', text: '虚心有节', side: 'right', color: '#6b7b3a' }
+                ]
+            },
+            'orchid': {
+                name: '兰',
+                nodes: [
+                    { type: 'quality', text: '幽洁芳香', group: 1, color: '#3b8a4d' },
+                    { type: 'verse', text: '兰若生春夏，<br>芊蔚何青青。', group: 2, color: '#d4a017' },
+                    { type: 'quality', text: '壮志难酬', group: 3, color: '#8a3b3b' },
+                    { type: 'poet', text: '屈原', group: 1, color: '#3b8a4d' },
+                    { type: 'poet', text: '陈子昂', group: 2, color: '#d4a017' },
+                    { type: 'poet', text: '李白', group: 3, color: '#8a3b3b' },
+                    { type: 'verse', text: '扈江离与辟芷兮，<br>纫秋兰以为佩。', group: 1, color: '#3b8a4d' },
+                    { type: 'quality', text: '怀才不遇', group: 2, color: '#d4a017' },
+                    { type: 'verse', text: '孤兰生幽园，<br>众草共芜没。', group: 3, color: '#8a3b3b' }
+                ]
+            }
+        };
+
+        const graphArea = document.getElementById('graphArea');
+        const svgLayer = document.getElementById('connections');
+
+        // 获取URL参数
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const currentPlant = getQueryParam('plant');
+
+        // 初始化
+        window.onload = function () {
+            if (currentPlant && knowledgeData[currentPlant]) {
+                renderGraph(currentPlant);
+            } else {
+                alert('未找到植物数据，即将返回首页');
+                window.location.href = 'index.html';
+            }
+        };
+
+        // 窗口调整大小时重绘
+        let resizeTimer;
+        window.onresize = function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (currentPlant) renderGraph(currentPlant);
+            }, 200);
+        };
+
+        function renderGraph(plantKey) {
+            const data = knowledgeData[plantKey];
+
+            // 1. 清理
+            const nodes = graphArea.querySelectorAll('.center-node, .child-node, .transition-text, .center-hint');
+            nodes.forEach(n => n.remove());
+            nodes.forEach(n => n.remove());
+            // 清除装饰元素
+            graphArea.querySelectorAll('.plum-blossom').forEach(b => b.remove());
+            graphArea.querySelectorAll('.bg-decor').forEach(b => b.remove());
+            graphArea.querySelectorAll('.bamboo-leaf-anim').forEach(b => b.remove());
+            // 保留 defs，只清除其他 SVG 内容
+            const defs = svgLayer.querySelector('defs');
+            svgLayer.innerHTML = '';
+            if (defs) svgLayer.appendChild(defs);
+
+            const centerX = graphArea.clientWidth / 2;
+            const centerY = graphArea.clientHeight / 2;
+
+            // 2. 中心节点 (点击返回介绍也行，或者不做操作)
+            const centerNode = document.createElement('div');
+            let shapeClass = '';
+            if (plantKey === 'orchid') shapeClass = ' orchid-shape';
+            if (plantKey === 'bamboo') shapeClass = ' bamboo-shape';
+            centerNode.className = 'center-node' + shapeClass;
+            centerNode.innerText = data.name;
+            const nodeHalf = (plantKey === 'orchid' || plantKey === 'bamboo') ? 65 : 45;
+            centerNode.style.left = (centerX - nodeHalf) + 'px';
+            centerNode.style.top = (centerY - nodeHalf) + 'px';
+            // 点击中心节点去往详细介绍页面的对应板块
+            centerNode.onclick = () => {
+                window.location.href = `introduction.html?plant=${plantKey}`;
+            };
+            centerNode.style.cursor = 'pointer';
+            centerNode.title = "点击查看详细介绍";
+            graphArea.appendChild(centerNode);
+
+            // 中心节点下方提示文字
+            const centerHint = document.createElement('div');
+            centerHint.className = 'center-hint';
+            centerHint.innerText = '点击图标学习诗词';
+            centerHint.style.cssText = 'position:absolute; text-align:center; font-size:0.8em; color:#999; letter-spacing:1px; pointer-events:none; white-space:nowrap;';
+            centerHint.style.left = centerX + 'px';
+            centerHint.style.top = (centerY + nodeHalf + 10) + 'px';
+            centerHint.style.transform = 'translateX(-50%)';
+            graphArea.appendChild(centerHint);
+
+            // 特殊处理排版布局
+            if (plantKey === 'plum') {
+                renderPlumGraph(data, centerX, centerY);
+            } else if (plantKey === 'orchid') {
+                renderOrchidGraph(data, centerX, centerY);
+            } else if (plantKey === 'bamboo') {
+                renderBambooGraph(data, centerX, centerY);
+            } else {
+                // 3. 其他植物：子节点放射状
+                const totalNodes = data.nodes.length;
+                const radius = Math.min(centerX, centerY) * 0.65;
+
+                data.nodes.forEach((item, index) => {
+                    const angle = (2 * Math.PI / totalNodes) * index - Math.PI / 2;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    createNodeAndLine(item, centerX, centerY, x, y, plantKey);
+                });
+            }
+        }
+
+        function renderPlumGraph(data, centerX, centerY) {
+            const radiusX = Math.min(centerX, centerY) * 0.9;
+            const gapY = 160;
+
+            // 添加左右背景图
+            const bgLeft = document.createElement('div');
+            bgLeft.className = 'bg-decor bg-left';
+            bgLeft.innerHTML = '<img src="花草/梅背景左.png" alt="">';
+            graphArea.appendChild(bgLeft);
+
+            const bgRight = document.createElement('div');
+            bgRight.className = 'bg-decor bg-right';
+            bgRight.innerHTML = '<img src="花草/梅背景右.png" alt="">';
+            graphArea.appendChild(bgRight);
+
+            const leftNodes = data.nodes.filter(n => n.side === 'left');
+            const rightNodes = data.nodes.filter(n => n.side === 'right');
+
+            // 绘制左侧节点 (林逋)
+            leftNodes.forEach((item, index) => {
+                const x = centerX - radiusX;
+                const y = centerY + (index - 1) * gapY;
+                createNodeAndLine(item, centerX, centerY, x, y, 'plum');
+            });
+
+            // 绘制右侧节点 (陆游)
+            rightNodes.forEach((item, index) => {
+                const x = centerX + radiusX;
+                const y = centerY + (index - 1) * gapY;
+                createNodeAndLine(item, centerX, centerY, x, y, 'plum');
+            });
+
+            // 添加中间的转变箭头
+            drawArrow(centerX - 100, centerY + (gapY * 1.5), centerX + 100, centerY + (gapY * 1.5), "精神转变");
+
+            // 添加中间的过渡文字
+            const transitionEl = document.createElement('div');
+            transitionEl.className = 'transition-text';
+            transitionEl.innerHTML = '从“孤芳自赏”的超然<br>到“零落成泥”的悲壮';
+            // 居中放置在箭头上方一点
+            transitionEl.style.left = (centerX - 100) + 'px';
+            transitionEl.style.top = (centerY - gapY * 0.8) + 'px';
+            transitionEl.style.width = '200px';
+            graphArea.appendChild(transitionEl);
+
+            // 添加梅花装饰
+            addPlumBlossoms(centerX, centerY);
+        }
+
+        function renderOrchidGraph(data, centerX, centerY) {
+            const radius = Math.min(centerX, centerY) * 0.75;
+
+            // 添加左右背景图 (兰1 兰2)
+            const bgLeft = document.createElement('div');
+            bgLeft.className = 'bg-decor bg-left';
+            bgLeft.innerHTML = '<img src="花草/兰1.png" alt="">';
+            graphArea.appendChild(bgLeft);
+
+            const bgRight = document.createElement('div');
+            bgRight.className = 'bg-decor bg-right';
+            // 使用 cover 让图片不留白边填满整个右侧背景区域，同时锚定靠右居中显示
+            bgRight.innerHTML = '<img src="花草/兰二.png" alt="" style="object-fit: cover; object-position: right center; width: 100%; height: 100%;">';
+            graphArea.appendChild(bgRight);
+
+            // 为兰花的数据分组和赋色
+            data.nodes.forEach(n => {
+                if (n.text.includes('屈原') || n.text.includes('幽洁') || n.text.includes('江离')) {
+                    n.color = '#3b8a4d'; // 屈原：绿色
+                    n.group = 1;
+                } else if (n.text.includes('陈子昂') || n.text.includes('怀才不遇') || n.text.includes('春夏')) {
+                    n.color = '#d4a017'; // 陈子昂：暖金色
+                    n.group = 2;
+                } else {
+                    n.color = '#8a3b3b'; // 李白：胭脂红
+                    n.group = 3;
+                }
+            });
+
+            // 分布函数
+            function spreadNodes(nodes, baseAngle, customStep = 0.38) {
+                nodes.forEach((item, index) => {
+                    const angle = baseAngle + (index - 1) * customStep;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    createNodeAndLine(item, centerX, centerY, x, y, 'orchid');
+                });
+            }
+
+            // 屈原 3 格子在上方，因为名句较宽，所以拉大夹角
+            const g1 = data.nodes.filter(n => n.group === 1);
+            spreadNodes(g1, -Math.PI / 2, 0.6);
+
+            // 陈子昂 3 格子在左下
+            const g2 = data.nodes.filter(n => n.group === 2);
+            spreadNodes(g2, Math.PI - Math.PI / 6, 0.38);
+
+            // 李白 3 格子在右下
+            const g3 = data.nodes.filter(n => n.group === 3);
+            spreadNodes(g3, Math.PI / 6, 0.38);
+
+            // 绘制左右两边指向下的箭头（精神转变）
+            // 调整箭头的起点（下移并向外扩一点），避免碰到连接屈原节点的射线
+            // 左边：从顶部区域下方向外延展，指向左下陈子昂
+            drawArrow(centerX - 100, centerY - radius * 0.2, centerX - radius * 0.6, centerY + radius * 0.1, "精神转变", -40, 0);
+            // 右边：从顶部区域下方向外延展，指向右下李白
+            drawArrow(centerX + 100, centerY - radius * 0.2, centerX + radius * 0.6, centerY + radius * 0.1, "精神转变", 40, 0);
+
+            // 添加中间的过渡文字
+            const transitionEl = document.createElement('div');
+            transitionEl.className = 'transition-text';
+            transitionEl.innerHTML = '一脉相承的高洁';
+            transitionEl.style.color = '#3b8a4d'; // 修改为绿色
+            // 居中放置在中心节点下方
+            transitionEl.style.left = (centerX - 100) + 'px';
+            transitionEl.style.top = (centerY + 90) + 'px';
+            transitionEl.style.width = '200px';
+            graphArea.appendChild(transitionEl);
+
+            // 添加兰草生长的背景动画
+            addOrchidGrass();
+        }
+
+        function renderBambooGraph(data, centerX, centerY) {
+            // 添加左右背景图 (竹左 竹右)
+            const bgLeft = document.createElement('div');
+            bgLeft.className = 'bg-decor bg-left';
+            bgLeft.innerHTML = '<img src="花草/竹左.png" alt="">';
+            graphArea.appendChild(bgLeft);
+
+            const bgRight = document.createElement('div');
+            bgRight.className = 'bg-decor bg-right';
+            bgRight.innerHTML = '<img src="花草/竹右.png" alt="" style="object-fit: cover; object-position: right center; width: 100%; height: 100%;">';
+            graphArea.appendChild(bgRight);
+
+            // 左右分组布局（类似梅花）
+            const radiusX = Math.min(centerX, centerY) * 0.9;
+            const gapY = 160;
+
+            const leftNodes = data.nodes.filter(n => n.side === 'left');
+            const rightNodes = data.nodes.filter(n => n.side === 'right');
+
+            // 绘制左侧节点 (郑燮)
+            leftNodes.forEach((item, index) => {
+                const x = centerX - radiusX;
+                const y = centerY + (index - 1) * gapY;
+                createNodeAndLine(item, centerX, centerY, x, y, 'bamboo');
+            });
+
+            // 绘制右侧节点 (王维)
+            rightNodes.forEach((item, index) => {
+                const x = centerX + radiusX;
+                const y = centerY + (index - 1) * gapY;
+                createNodeAndLine(item, centerX, centerY, x, y, 'bamboo');
+            });
+
+            // 竹字上方文字：外具刚劲，内守虚静
+            const topText = document.createElement('div');
+            topText.className = 'transition-text';
+            topText.innerHTML = '外具刚劲，内守虚静';
+            topText.style.color = '#5b8c5a';
+            topText.style.fontSize = '1.3rem';
+            topText.style.left = (centerX - 120) + 'px';
+            topText.style.top = (centerY - 110) + 'px';
+            topText.style.width = '240px';
+            graphArea.appendChild(topText);
+
+            // 顶部空白区域装饰文字：君子之风
+            const decorTopText = document.createElement('div');
+            decorTopText.className = 'transition-text';
+            decorTopText.innerHTML = '君子之风';
+            decorTopText.style.color = 'rgba(91, 140, 90, 0.5)';
+            decorTopText.style.fontSize = '3rem';
+            decorTopText.style.fontFamily = "'FZZJ-ZTXKJW', 'STZhuan', 'FZZhuanTi-S01S', 'LiSu', cursive";
+            decorTopText.style.letterSpacing = '10px';
+            decorTopText.style.whiteSpace = 'nowrap'; // 强制不换行
+            decorTopText.style.left = (centerX - 150) + 'px'; // 调整居中 (文字实际宽度约300px)
+            decorTopText.style.top = '40px';
+            decorTopText.style.width = '300px';
+            decorTopText.style.textAlign = 'center';
+            decorTopText.style.animation = 'expandOut 1s forwards';
+            graphArea.appendChild(decorTopText);
+
+            // 下方双箭头 + 中间文字
+            const bottomText = document.createElement('div');
+            bottomText.className = 'transition-text';
+            bottomText.innerHTML = '←&nbsp;&nbsp;传统士大夫所追求的人格境界&nbsp;&nbsp;→';
+            bottomText.style.fontSize = '1.3rem';
+            bottomText.style.left = (centerX - 180) + 'px';
+            bottomText.style.top = (centerY + (gapY * 1.3)) + 'px';
+            bottomText.style.width = '360px';
+            graphArea.appendChild(bottomText);
+
+            // 添加竹叶飘落的背景动画
+            addBambooLeaves();
+        }
+
+        function addBambooLeaves() {
+            for (let i = 0; i < 15; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'bamboo-leaf-anim';
+                // 简单的SVG竹叶形状
+                leaf.innerHTML = `<svg viewBox="0 0 30 10" width="30" height="10" xmlns="http://www.w3.org/2000/svg"><path d="M0,5 Q15,-2 30,5 Q15,12 0,5 Z" fill="#5b8c5a" opacity="0.6"/></svg>`;
+
+                const startX = Math.random() * graphArea.clientWidth;
+                const startY = -30 - Math.random() * 50;
+
+                leaf.style.left = startX + 'px';
+                leaf.style.top = startY + 'px';
+
+                const duration = 6 + Math.random() * 8;
+                const delay = Math.random() * 5;
+                const scale = 0.6 + Math.random() * 0.8;
+
+                leaf.style.setProperty('--dx1', (Math.random() * 100 - 50) + 'px');
+                leaf.style.setProperty('--dx2', (Math.random() * 200 - 100) + 'px');
+
+                const wrapper = document.createElement('div');
+                wrapper.style.transform = `scale(${scale})`;
+                wrapper.appendChild(leaf.firstChild);
+                leaf.innerHTML = '';
+                leaf.appendChild(wrapper);
+
+                leaf.style.animation = `fallBambooLeaf ${duration}s linear ${delay}s infinite`;
+
+                graphArea.appendChild(leaf);
+            }
+        }
+
+        function createNodeAndLine(item, cx, cy, x, y, plantKey) {
+            const node = document.createElement('div');
+            node.className = `child-node type-${item.type}`;
+
+            if (item.color) {
+                node.style.setProperty('--node-color', item.color);
+                node.classList.add('custom-color');
+            }
+
+            // 梅花左右异色
+            if (plantKey === 'plum' && item.side) {
+                node.classList.add(`plum-${item.side}`);
+            }
+
+            let labelText = '';
+            if (item.type === 'quality') labelText = '【意象/品格】';
+            if (item.type === 'poet') labelText = plantKey === 'orchid' ? '【代表人物】' : '【代表诗人】';
+            if (item.type === 'verse') labelText = '【名句】';
+
+            node.innerHTML = `<span class="node-label">${labelText}</span>${item.text}`;
+
+            // 根据植物类型设置角落小图标
+            var plantIcon = '"✿"';
+            if (plantKey === 'bamboo') plantIcon = '"🎋"';
+            else if (plantKey === 'orchid') plantIcon = '"🌿"';
+            node.style.setProperty('--plant-icon', plantIcon);
+
+            graphArea.appendChild(node);
+
+            // 修正定位
+            const w = node.offsetWidth;
+            const h = node.offsetHeight;
+            node.style.left = (x - w / 2) + 'px';
+            node.style.top = (y - h / 2) + 'px';
+
+            // 连线到中心，但避开中心的梅花区域 (半径避开大约 55px)
+            const dx = x - cx;
+            const dy = y - cy;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // 为了防止连线进入中心梅花的图形内部
+            const centerOffset = 55;
+            const startX = cx + (dx / distance) * centerOffset;
+            const startY = cy + (dy / distance) * centerOffset;
+
+            // 连线到子节点边缘
+            drawLine(startX, startY, x, y);
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#ccc');
+            line.setAttribute('stroke-width', '1.5');
+
+            line.innerHTML = `<animate attributeName="x2" from="${x1}" to="${x2}" dur="0.6s" fill="freeze" />
+                          <animate attributeName="y2" from="${y1}" to="${y2}" dur="0.6s" fill="freeze" />`;
+
+            const svgLayerToUse = document.getElementById('connections');
+            svgLayerToUse.appendChild(line);
+        }
+
+        function drawArrow(x1, y1, x2, y2, text, textOffsetX = 0, textOffsetY = -10) {
+            // 绘制带箭头的线
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#8a3b3b');
+            line.setAttribute('stroke-width', '2');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+
+            // 绘制文字
+            const textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textNode.setAttribute('x', (x1 + x2) / 2 + textOffsetX);
+            textNode.setAttribute('y', (y1 + y2) / 2 + textOffsetY);
+            textNode.setAttribute('fill', '#8a3b3b');
+            textNode.setAttribute('font-size', '14px');
+            textNode.setAttribute('text-anchor', 'middle');
+            textNode.textContent = text;
+
+            const svgLayerToUse = document.getElementById('connections');
+            svgLayerToUse.appendChild(line);
+            svgLayerToUse.appendChild(textNode);
+        }
+
+        // 生成浮动梅花装饰（覆盖整个屏幕）
+        function addPlumBlossoms(centerX, centerY) {
+            const w = graphArea.clientWidth;
+            const h = graphArea.clientHeight;
+            const count = 20; // 更多梅花
+            const colors = ['#e8a0bf', '#f5c6d0', '#d4526e', '#f2b5d4', '#c9485b', '#e57373', '#f48fb1'];
+
+            for (let i = 0; i < count; i++) {
+                const blossom = document.createElement('div');
+                blossom.className = 'plum-blossom';
+                blossom.style.left = (Math.random() * w) + 'px';
+                blossom.style.top = (Math.random() * h) + 'px';
+                blossom.style.animationDelay = (Math.random() * 8) + 's';
+                blossom.style.animationDuration = (6 + Math.random() * 4) + 's';
+                blossom.style.fontSize = (22 + Math.random() * 18) + 'px';
+                blossom.style.color = colors[Math.floor(Math.random() * colors.length)];
+                blossom.textContent = '❀';
+                graphArea.appendChild(blossom);
+            }
+        }
+        // 生成全屏随机生长并淡出的兰草动画
+        function addOrchidGrass() {
+            const w = graphArea.clientWidth;
+            const h = graphArea.clientHeight;
+
+            // 添加全局动画样式
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .orchid-grass-wrapper {
+                    position: absolute;
+                    width: 250px;
+                    height: 350px;
+                    z-index: 5;
+                    pointer-events: none;
+                    animation: fadeLife 12s ease-in-out forwards;
+                }
+                @keyframes fadeLife {
+                    0% { opacity: 0; }
+                    5% { opacity: 0.85; }
+                    85% { opacity: 0.85; }
+                    100% { opacity: 0; }
+                }
+                .orchid-leaf { 
+                    fill: none; 
+                    stroke: #596b52; 
+                    stroke-linecap: round;
+                    stroke-dasharray: 1000;
+                    stroke-dashoffset: 1000;
+                }
+                .leaf-base { stroke-width: 6; animation: growLeaf 2s ease-out forwards; }
+                .leaf-mid { stroke-width: 4; animation: growLeaf 2.5s ease-out forwards; }
+                .leaf-tip { stroke-width: 2; animation: growLeaf 3s ease-out forwards; }
+                
+                @keyframes growLeaf {
+                    from { stroke-dashoffset: 1000; }
+                    to { stroke-dashoffset: 0; }
+                }
+            `;
+            // 防止重复添加 style
+            if (!document.getElementById('orchid-anim-style')) {
+                style.id = 'orchid-anim-style';
+                document.head.appendChild(style);
+            }
+
+            let spawnZone = 0; // 0=左, 1=右, 2=底部，三区轮换
+
+            function spawnGrass() {
+                // 如果图谱被切换走，不再生成
+                if (getQueryParam('plant') !== 'orchid') return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'bg-decor orchid-grass-wrapper';
+                wrapper.style.zIndex = '-1'; // 确保兰草动画绝对在底层，不遮挡文字框
+
+                const centerX = w / 2;
+                const centerY = h / 2;
+
+                // 三个安全区域轮换：左边缘、右边缘、底部边缘
+                const edgeMargin = 120;
+                let randomX, randomY;
+                const zone = spawnZone % 3;
+
+                if (zone === 0) {
+                    // 左边缘窄带，纵向从 15% 到 85% 高度
+                    randomX = Math.random() * edgeMargin;
+                    randomY = h * 0.15 + Math.random() * (h * 0.7 - 350);
+                } else if (zone === 1) {
+                    // 右边缘窄带，纵向从 15% 到 85% 高度
+                    randomX = w - 250 - Math.random() * edgeMargin;
+                    randomY = h * 0.15 + Math.random() * (h * 0.7 - 350);
+                } else {
+                    // 底部横带，横向避开最中间（射线图核心），只在左半或右半的底部
+                    if (Math.random() > 0.5) {
+                        randomX = Math.random() * (centerX - 200);
+                    } else {
+                        randomX = centerX + 100 + Math.random() * (centerX - 300);
+                    }
+                    randomY = h - 350 - Math.random() * 30;
+                }
+
+                // 翻转方向：左侧朝右、右侧朝左、底部随机
+                const scaleX = zone === 0 ? 1 : zone === 1 ? -1 : (Math.random() > 0.5 ? 1 : -1);
+                const scaleM = 0.5 + Math.random() * 0.5;
+                spawnZone++;
+
+                wrapper.style.left = randomX + 'px';
+                wrapper.style.top = randomY + 'px';
+                wrapper.style.transform = `scaleX(${scaleX}) scaleY(${scaleM})`;
+
+                // 创建 SVG 元素
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 200 300');
+                svg.style.width = '100%';
+                svg.style.height = '100%';
+                svg.style.overflow = 'visible';
+
+                // 更加逼真的国画兰草路径，动画延时直接控制生长速度
+                svg.innerHTML = `
+                    <g>
+                        <!-- 第一笔：主叶，长而挺拔，带有翻折感 -->
+                        <path class="orchid-leaf leaf-base" d="M100,300 C90,250 60,150 40,80" />
+                        <path class="orchid-leaf leaf-mid"  d="M100,280 C80,200 45,130 30,50" style="animation-delay: 0.1s" />
+                        
+                        <!-- 第二笔：右侧长叶，飘逸下垂 -->
+                        <path class="orchid-leaf leaf-base" d="M105,300 C120,220 160,140 190,180" style="animation-delay: 0.2s" />
+                        <path class="orchid-leaf leaf-mid"  d="M105,270 C130,190 170,120 195,140" style="animation-delay: 0.3s" />
+                        <path class="orchid-leaf leaf-tip"  d="M195,140 C200,150 195,170 185,190" style="animation-delay: 0.4s" />
+
+                        <!-- 第三笔：左侧短叶，粗壮劲挺 -->
+                        <path class="orchid-leaf leaf-base" d="M95,300 C80,260 50,230 20,220" style="animation-delay: 0.5s" />
+                        <path class="orchid-leaf leaf-mid"  d="M93,290 C70,240 40,210 15,200" style="animation-delay: 0.6s" />
+                        
+                        <!-- 第四笔：穿插叶，丰富层次 -->
+                        <path class="orchid-leaf leaf-mid" d="M110,300 C130,260 140,200 120,130" opacity="0.8" style="animation-delay: 0.8s" />
+                        <path class="orchid-leaf leaf-tip" d="M120,130 C110,100 100,90 90,80" opacity="0.8" style="animation-delay: 1.0s" />
+                        
+                        <!-- 稍微加几根细长的副叶 -->
+                        <path class="orchid-leaf leaf-tip" d="M98,300 C85,200 110,120 150,60" opacity="0.6" style="animation-delay: 1.2s" />
+                    </g>
+                `;
+
+                wrapper.appendChild(svg);
+                graphArea.appendChild(wrapper);
+
+                // 12秒后淡出动画结束，移除 DOM 节点
+                setTimeout(() => {
+                    if (wrapper.parentNode) {
+                        wrapper.parentNode.removeChild(wrapper);
+                    }
+                }, 12000);
+            }
+
+            // 初始化先长出 1 丛
+            spawnGrass();
+
+            // 之后每隔 2.5 ~ 4.5 秒随机在这片空间里长出一丛，循环往复
+            function loopSpawn() {
+                if (getQueryParam('plant') !== 'orchid') return;
+                spawnGrass();
+                const nextTime = 2500 + Math.random() * 2000;
+                setTimeout(loopSpawn, nextTime);
+            }
+            setTimeout(loopSpawn, 2000);
+        }
+    </script>
+    <script src="ai_assistant.js"></script>
+</body>
+
+</html>

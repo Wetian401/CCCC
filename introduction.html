@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>植物介绍 - 诗词植物意象交互图谱</title>
+    <style>
+        :root {
+            --bg-color: #f7f5f0;
+            --text-color: #2c2c2c;
+            --accent-color: #8a3b3b;
+            --card-bg: #fff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "KaiTi", "STKaiti", "Georgia", serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: normal;
+            letter-spacing: 3px;
+            color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .plant-section {
+            background: var(--card-bg);
+            margin-bottom: 40px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .plant-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .plant-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background-color: rgba(138, 59, 59, 0.05);
+        }
+
+        .plant-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--accent-color);
+        }
+
+        .content {
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .plant-img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .text-content {
+            flex: 1;
+        }
+
+        .text-content p {
+            margin-bottom: 20px;
+            text-indent: 2em;
+            font-size: 1.15em;
+            line-height: 1.8;
+        }
+
+        .header-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 25px;
+            background-color: var(--accent-color);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #6b2c2c;
+        }
+
+        /* 诗词展示区样式 */
+        .poem-block {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fdfaf5;
+            border-left: 6px solid #8a3b3b;
+            display: flex;
+            gap: 40px;
+            align-items: stretch;
+            min-height: 600px;
+            /* 继续增加高度让国画展现完全 */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+
+        .poem-block .poem-img-wrap {
+            flex: 0 0 35%;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .poem-block .poem-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .poem-block .poem-text-wrap {
+            flex: 1 1 65%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .poem-block .poem-title {
+            text-align: center;
+            margin: 0 0 10px 0;
+            color: #8a3b3b;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .poem-block .poem-author {
+            text-align: center;
+            margin: 0 0 25px 0;
+            color: #666;
+            font-size: 1.1em;
+            text-indent: 0;
+        }
+
+        .poem-block .poem-verse {
+            text-align: center;
+            line-height: 2.2;
+            font-size: 1.2em;
+            font-family: 'KaiTi', 'STKaiti', serif;
+            white-space: nowrap;
+            text-indent: 0;
+            margin-bottom: 15px;
+        }
+
+        .poem-block .poem-notes {
+            font-size: 0.95em;
+            color: #555;
+            padding-left: 20px;
+            line-height: 1.8;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .plant-img {
+                width: 100%;
+                max-width: 300px;
+                height: auto;
+            }
+
+            .poem-block {
+                flex-direction: column;
+                min-height: auto;
+            }
+
+            .poem-block .poem-img-wrap {
+                flex: none;
+                height: 300px;
+            }
+
+            .poem-block .poem-verse {
+                white-space: normal;
+            }
+        }
+
+        /* 课后习题按钮 */
+        .quiz-btn-container {
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-btn {
+            display: inline-block;
+            padding: 12px 36px;
+            background-color: var(--accent-color);
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.4rem;
+            border-radius: 40px;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 12px rgba(138, 59, 59, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: 'KaiTi', 'STKaiti', serif;
+        }
+
+        .quiz-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .quiz-btn:hover {
+            background-color: #6b2c2c;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(138, 59, 59, 0.5);
+            color: #fff;
+        }
+
+        .quiz-btn:hover::before {
+            left: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>植物意象深度解析</h1>
+        <p>探索中国传统文学中的植物精神</p>
+        <div class="header-actions">
+            <a href="index.html" class="back-btn">返回首页</a>
+            <a href="tradition.html" class="back-btn">学习比德传统</a>
+            <a href="graph.html" class="back-btn" id="backToGraphBtn">返回该图谱</a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <section id="plum" class="plant-section">
+            <div class="plant-header">
+                <h2>梅 (Plum Blossom)</h2>
+            </div>
+            <div class="content">
+                <img src="花草\Plum-Blossom-national-flower-of-china.jpg" alt="梅花" class="plant-img">
+                <div class="text-content">
+                    <h3 style="color: var(--accent-color); margin-top: 0; font-size: 1.6rem;">（一）梅格：从隐逸之姿到志士之魂</h3>
+                    <p>提起梅花，便不得不提北宋林逋的《山园小梅》，"疏影横斜水清浅，暗香浮动月黄昏"。尤其是"疏影"与"暗香"两词，梅枝疏朗不繁，不与百花争艳；花香清幽淡远，不向世俗邀宠。这不仅是写梅，更是林逋自身的人生写照——他隐居西湖孤山，以梅为妻、以鹤为子，远离尘嚣，不问世事，这份孤高与超然，使梅成为了隐逸之士的精神图腾。
+                    </p>
+                    <p>而到了南宋陆游笔下，梅的人格内涵完成了深刻的升华。他在《卜算子·咏梅》中写到"零落成泥碾作尘，只有香如故"。一个"碾"字，道尽了梅花所受的摧折与磨难，可即便零落为泥、被车马碾作尘土，那一缕清香依旧永存。彼时南宋山河破碎，陆游一生壮志未酬，这株梅，早已不是那自然之梅，而是他人格的化身，是坚守理想、九死不悔的志士象征。
+                    </p>
+                    <p>从林逋的"隐者之梅"到陆游的"斗士之梅"，梅的人格，随着时代境遇与诗人胸怀的不同，完成了从超然到悲壮的精神升华。</p>
+                </div>
+            </div>
+
+            <!-- 诗词展示区：独立于 .content，占满 section 宽度 -->
+            <div style="padding: 0 30px 30px 30px;">
+                <div class="poem-block">
+                    <div class="poem-img-wrap">
+                        <img src="花草/林逋.png" alt="林逋">
+                    </div>
+                    <div class="poem-text-wrap">
+                        <h3 class="poem-title">山园小梅（其一）</h3>
+                        <p class="poem-author">北宋 · 林逋</p>
+                        <p class="poem-verse">
+                            众芳摇落独暄妍，占尽风情向小园。<br>
+                            疏影横斜水清浅，暗香浮动月黄昏。<br>
+                            霜禽欲下先偷眼，粉蝶如知合断魂。<br>
+                            幸有微吟可相狎，不须檀板共金樽。
+                        </p>
+                        <ol class="poem-notes">
+                            <li><strong>暄妍：</strong>明媚艳丽，形容梅花的娇美姿态。</li>
+                            <li><strong>疏影：</strong>梅枝疏朗的影子，为咏梅经典意象。</li>
+                            <li><strong>暗香：</strong>梅花清幽淡远的香气，与"疏影"相映成趣。</li>
+                            <li><strong>霜禽：</strong>冬日的禽鸟。</li>
+                            <li><strong>狎：</strong>亲近、相伴。</li>
+                            <li><strong>檀板：</strong>檀木做的拍板，代指宴饮的乐舞。</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="poem-block">
+                    <div class="poem-img-wrap">
+                        <img src="花草/陆游.png" alt="陆游">
+                    </div>
+                    <div class="poem-text-wrap">
+                        <h3 class="poem-title">卜算子 · 咏梅</h3>
+                        <p class="poem-author">南宋 · 陆游</p>
+                        <p class="poem-verse">
+                            驿外断桥边，寂寞开无主。<br>
+                            已是黄昏独自愁，更著风和雨。<br>
+                            无意苦争春，一任群芳妒。<br>
+                            零落成泥碾作尘，只有香如故。
+                        </p>
+                        <ol class="poem-notes">
+                            <li><strong>驿外：</strong>驿站之外，指偏僻无人之地。</li>
+                            <li><strong>无主：</strong>无人照料、欣赏。</li>
+                            <li><strong>著：</strong>遭受、承受。</li>
+                            <li><strong>碾：</strong>碾压，指梅花凋零后被车马碾作尘土。</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="orchid" class="plant-section">
+            <div class="plant-header">
+                <h2>兰 (Orchid)</h2>
+            </div>
+            <div class="content">
+                <img src="花草\a0737aee0dc3b2968dc8e5cd31df5c7a.png" alt="兰花" class="plant-img">
+                <div class="text-content">
+                    <p>说完了梅，我们再来看兰。兰的人格意象由文化先贤屈原定调，深深刻入了中华文脉。大家不妨回顾《离骚》中的经典名句：“扈江离与辟芷兮，纫秋兰以为佩。”请大家关注“佩”这个动作——将秋兰缀于衣襟，这并非简单的装饰，而是屈原以兰自喻，将兰的幽洁芳香与自身的高尚品德紧密相融。他心怀家国、坚守正道，却遭奸佞陷害、屡遭贬谪，以兰为佩，是明志，是坚守，更是不与世俗同流合污的精神追求。自此，空谷幽兰便成为刻入中华文脉的高洁符号，从未褪色。
+                    </p>
+                    <p>后世诗人皆循着这份高洁底色，为兰的人格添彩。陈子昂写“兰若生春夏，芊蔚何青青”，以兰草的繁茂葱茏自喻德才兼备，借兰草空有芳姿却无人赏识的境遇，从而抒发自身怀才不遇的愤懑；李白写“孤兰生幽园，众草共芜没”，以兰被杂草埋没的境遇，诉说自身壮志难酬的悲叹。
+                    </p>
+                    <p>同一株兰，既是集体认同的高洁标尺，同时也承载着个体命运的细微叹息，在共性与个性的交融中，永葆鲜活。</p>
+                </div>
+            </div>
+
+            <!-- 兰花诗词展示区 -->
+            <div style="padding: 0 30px 30px 30px;">
+                <div class="poem-block">
+                    <div class="poem-img-wrap">
+                        <img src="花草/屈原.png" alt="屈原">
+                    </div>
+                    <div class="poem-text-wrap">
+                        <h3 class="poem-title">离骚（节选）</h3>
+                        <p class="poem-author">战国 · 屈原</p>
+                        <p class="poem-verse" style="font-size: 1.5em; line-height: 2.5;">
+                            扈江离与辟芷兮，纫秋兰以为佩。<br>
+                            汩余若将不及兮，恐年岁之不吾与。
+                        </p>
+                        <ol class="poem-notes" style="font-size: 1.3em; line-height: 2;">
+                            <li><strong>扈：</strong>披戴。</li>
+                            <li><strong>江离、辟芷：</strong>皆为古代香草名，喻高洁。</li>
+                            <li><strong>纫：</strong>连缀、编织。</li>
+                            <li><strong>佩：</strong>佩饰，指挂在身上的饰物。</li>
+                            <li><strong>汩：</strong>形容时光流逝迅速。</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="bamboo" class="plant-section">
+            <div class="plant-header">
+                <h2>竹 (Bamboo)</h2>
+            </div>
+            <div class="content">
+                <img src="花草\Phyllostachys-vivaxA-rotated.jpg" alt="竹子" class="plant-img">
+                <div class="text-content">
+                    <p>而最后呢，我们来看竹，它是最贴合人格理想的自然喻体，藏着中国人独有的刚柔并济的人生智慧。</p>
+                    <p>“千磨万击还坚劲，任尔东西南北风。”郑板桥《竹石》中的竹，扎根破岩、无沃土滋养，历经风雨打磨、千锤百炼，却始终挺拔向上。这是儒家“天行健，君子以自强不息”的精神写照，是面对困境时的坚韧风骨，更是刻入中国人骨髓的社会担当。
+                    </p>
+                    <p>而王维在《竹里馆》中写“独坐幽篁里，弹琴复长啸”，又为竹添上了柔静的底色。一片幽篁，远离尘嚣，诗人独坐其中，弹琴长啸，悠然自得，这方竹林，成为了文人心灵安顿的净土。竹中空有节，是谦逊低调、虚怀若谷；竹静立天地，则是返璞归真、涵养心性。
+                    </p>
+                    <p>一竿翠竹，外具刚劲，内守虚静；既有面对困境的坚韧担当，又有安顿心灵的淡然从容，完美统合了“社会担当”与“心灵安顿”。这正是中国传统士大夫所追求的人格境界，也是竹能成为千年经典的核心缘由。</p>
+                </div>
+            </div>
+
+            <!-- 郑燮《竹石》 -->
+            <div style="padding: 0 30px 30px 30px;">
+                <div class="poem-block" style="border-left-color: #5b8c5a;">
+                    <div class="poem-img-wrap">
+                        <img src="花草/郑板桥.png" alt="郑板桥" style="object-position: center;">
+                    </div>
+                    <div class="poem-text-wrap">
+                        <h3 class="poem-title" style="font-size: 1.8em; margin-bottom: 5px;">竹石</h3>
+                        <p class="poem-author" style="font-size: 1.2em; margin-bottom: 20px;">清·郑燮（郑板桥）</p>
+                        <p class="poem-verse" style="font-size: 1.4em; line-height: 2.2;">
+                            咬定青山不放松，立根原在破岩中。<br>
+                            千磨万击还坚劲，任尔东西南北风。
+                        </p>
+                        <ol class="poem-notes" style="font-size: 1.2em; line-height: 2;">
+                            <li><strong>咬定：</strong>形容竹根紧紧扎根山石，如同咬住一般，极具画面感。</li>
+                            <li><strong>破岩：</strong>破裂的岩石缝隙。</li>
+                            <li><strong>千磨万击：</strong>指无数次的风雨打磨、外力摧残。</li>
+                            <li><strong>坚劲：</strong>坚韧刚劲。</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 王维《竹里馆》 -->
+            <div style="padding: 0 30px 30px 30px;">
+                <div class="poem-block" style="border-left-color: #6b7b3a;">
+                    <div class="poem-img-wrap">
+                        <img src="花草/王维.png" alt="王维" style="object-position: 25% bottom;">
+                    </div>
+                    <div class="poem-text-wrap">
+                        <h3 class="poem-title" style="font-size: 1.8em; margin-bottom: 5px;">竹里馆</h3>
+                        <p class="poem-author" style="font-size: 1.2em; margin-bottom: 20px;">唐·王维</p>
+                        <p class="poem-verse" style="font-size: 1.4em; line-height: 2.2;">
+                            独坐幽篁里，弹琴复长啸。<br>
+                            深林人不知，明月来相照。
+                        </p>
+                        <ol class="poem-notes" style="font-size: 1.2em; line-height: 2;">
+                            <li><strong>幽篁：</strong>幽深的竹林。</li>
+                            <li><strong>长啸：</strong>撮口发出悠长的声响，是古人抒发情怀的一种方式。</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 课后习题入口 -->
+        <div class="quiz-btn-container">
+            <a href="quiz.html" class="quiz-btn">课后习题</a>
+        </div>
+
+    </div>
+
+    <script>
+        // 获取当前植物对应的参数
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentPlant = urlParams.get('plant');
+
+        // 如果没有 plant 参数，尝试看有没有 hash (降级兼容)
+        if (!currentPlant && window.location.hash) {
+            currentPlant = window.location.hash.substring(1);
+        }
+
+        if (currentPlant) {
+            // 设置返回图谱的正确链接
+            document.getElementById('backToGraphBtn').href = `graph.html?plant=${currentPlant}`;
+
+            // 隐藏所有不是当前植物的区块
+            const allSections = document.querySelectorAll('.plant-section');
+            allSections.forEach(section => {
+                if (section.id !== currentPlant) {
+                    section.style.display = 'none';
+                }
+            });
+        }
+    </script>
+    <script src="ai_assistant.js"></script>
+</body>
+
+</html>

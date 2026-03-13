@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课后习题 - 诗词植物意象</title>
+    <style>
+        :root {
+            --bg-color: #f7f5f0;
+            --ink-color: #2c2c2c;
+            --accent-color: #8a3b3b;
+            --border-color: #d1d1d1;
+            --success-color: #3b8a4d;
+            --error-color: #8a3b3b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "KaiTi", "STKaiti", "Georgia", serif;
+            background-color: var(--bg-color);
+            color: var(--ink-color);
+            background-image: 
+                radial-gradient(var(--border-color) 1px, transparent 1px),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            background-size: 20px 20px, auto auto;
+            background-attachment: fixed;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--ink-color);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 30px 60px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            padding: 8px 20px;
+            border: 1px solid var(--ink-color);
+            text-decoration: none;
+            color: var(--ink-color);
+            border-radius: 30px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: var(--ink-color);
+            color: #fff;
+        }
+
+        /* 章节标题 */
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin: 50px 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-title::before, .section-title::after {
+            content: '';
+            height: 1px;
+            background-color: var(--accent-color);
+            flex: 1;
+            margin: 0 20px;
+            opacity: 0.5;
+            max-width: 150px;
+        }
+
+        /* 题目卡片 */
+        .question-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .q-text {
+            font-size: 1.35rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            text-align: left;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #f0ebe1;
+            border-color: #bbb;
+        }
+
+        .option-btn.selected-correct {
+            background: #e8f5e9;
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .option-btn.selected-wrong {
+            background: #ffebee;
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .option-btn.show-correct {
+            background: #e8f5e9;
+            border-color: var(--success-color);
+            color: var(--success-color);
+            opacity: 0.8;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: #fdfaf5;
+            border-left: 4px solid var(--accent-color);
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #555;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .explanation.visible {
+            display: block;
+        }
+
+        /* 主观题样式 */
+        .subjective-q .q-text {
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .poem-quote {
+            background: #f5f5f5;
+            padding: 15px 20px;
+            border-left: 4px solid #666;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .show-ans-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 25px;
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .show-ans-btn:hover {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .subjective-ans {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fdfaf5;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #444;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .subjective-ans.visible {
+            display: block;
+        }
+
+        .subjective-ans p {
+            margin: 10px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="javascript:history.back()" class="back-btn">← 返回</a>
+        <h1>课后习题</h1>
+        <p class="subtitle">温故知新 · 检验所学</p>
+    </header>
+
+    <div class="container">
+        <!-- 客观题部分 -->
+        <h2 class="section-title">客 观 题</h2>
+        <div id="objective-container"></div>
+
+        <!-- 主观题部分 -->
+        <h2 class="section-title">主 观 题</h2>
+        <div id="subjective-container"></div>
+    </div>
+
+    <script src="ai_assistant.js"></script>
+    <script>
+        // 客观题数据
+        const objectiveQuestions = [
+            {
+                q: "1、下列诗句中，塑造出梅花“悲壮志士”人格形象的是（）",
+                options: [
+                    { id: "A", text: "疏影横斜水清浅，暗香浮动月黄昏" },
+                    { id: "B", text: "零落成泥碾作尘，只有香如故" },
+                    { id: "C", text: "墙角数枝梅，凌寒独自开" },
+                    { id: "D", text: "梅须逊雪三分白，雪却输梅一段香" }
+                ],
+                answer: "B",
+                explanation: "陆游笔下的此句，写梅花历经风雨摧折、碾作尘土仍香气永存，契合其家国飘零的境遇，塑造出坚守理想、九死不悔的志士形象；A为林逋笔下远离尘俗的隐逸之梅；C是王安石笔下逆境中坚守自我的君子之梅；D仅为梅与雪的特质对比，未赋予人格内涵。"
+            },
+            {
+                q: "2、屈原在《离骚》中以“纫秋兰以为佩”赋予兰独特的人格内涵，自此兰成为了哪种核心文化符号的象征（）",
+                options: [
+                    { id: "A", text: "坚韧不屈的斗士" },
+                    { id: "B", text: "随遇而安的君子" },
+                    { id: "C", text: "高洁自持的君子" },
+                    { id: "D", text: "超然物外的隐士" }
+                ],
+                answer: "C",
+                explanation: "屈原将秋兰缀于衣襟，以兰的幽洁芳香自比，借兰的自然特质喻自身高尚品德，让兰成为高洁自持的君子象征，成为刻入中华文脉的原初性文化符号；A是陆游笔下梅的人格内涵，D是林逋笔下梅的人格内涵，B并非兰的核心象征意义。"
+            },
+            {
+                q: "3、竹被称作最贴合中国人格理想的自然喻体，其核心原因是（）",
+                options: [
+                    { id: "A", text: "竹四季常青，具有旺盛的生命力" },
+                    { id: "B", text: "竹刚柔并济，统合了社会担当与心灵安顿的人格追求" },
+                    { id: "C", text: "竹中空有节，仅象征着谦逊低调的美好品德" },
+                    { id: "D", text: "竹生长迅速，是蓬勃向上的生命力象征" }
+                ],
+                answer: "B",
+                explanation: "竹兼具刚健与柔静的双重特质，郑板桥笔下的竹体现儒家自强不息、坚守社会担当的刚劲，王维笔下的幽篁彰显道家返璞归真、心灵安顿的虚静，刚柔并济的特质完美契合传统士大夫的完整人格追求；A、D并非竹的人格象征核心，C中“仅象征”表述片面，竹的人格内涵远不止谦逊低调。"
+            },
+            {
+                q: "4、下列诗句中，梅花形象与陆游“零落成泥碾作尘，只有香如故”所塑志士之梅内涵最相近的是（）",
+                options: [
+                    { id: "A", text: "冰雪林中著此身，不同桃李混芳尘（王冕《白梅》）" },
+                    { id: "B", text: "待到山花烂漫时，她在丛中笑（毛泽东《卜算子・咏梅》）" },
+                    { id: "C", text: "朔风如解意，容易莫摧残（崔道融《梅花》）" },
+                    { id: "D", text: "玉骨那愁瘴雾，冰姿自有仙风（苏轼《西江月・梅花》）" }
+                ],
+                answer: "A",
+                explanation: "A句写白梅生于冰雪、不与桃李同流合污，彰显坚守本心、不媚世俗的坚贞，与陆游笔下梅的志士风骨一脉相承；B句侧重梅的豁达无私，C句侧重对梅的怜惜，D句侧重梅的清雅仙姿，均未突出“历经磨难仍坚守”的志士内涵。"
+            },
+            {
+                q: "5、下列咏兰诗句中，最能体现屈原“纫秋兰以为佩”中兰的高洁自持内核的是（）",
+                options: [
+                    { id: "A", text: "泣露光偏乱，含风影自斜（李世民《芳兰》）" },
+                    { id: "B", text: "不要人夸好颜色，只留清气满乾坤（王冕《墨梅》）" },
+                    { id: "C", text: "幽兰花，在空山，美人爱之不可见（袁枚《幽兰》）" },
+                    { id: "D", text: "兰生幽谷无人识，客种东轩遗我香（苏辙《种兰》）" }
+                ],
+                answer: "C",
+                explanation: "C句写幽兰生于空山、孤高自守，虽不被世人所见仍保持芳洁，与屈原以兰喻自身高洁自持、不与世俗同流合污的内涵一致；A句仅描绘兰的形态，B句为咏梅诗，D句侧重兰的香气与赠予之谊，均未凸显核心的“高洁自持”。"
+            },
+            {
+                q: "6、下列咏竹诗句中，侧重表现竹“柔静虚怀、心灵安顿”特质的是（）",
+                options: [
+                    { id: "A", text: "露涤铅粉节，风摇青玉枝（刘禹锡《庭竹》）" },
+                    { id: "B", text: "竹影和诗瘦，梅花入梦香（王庭筠《绝句》）" },
+                    { id: "C", text: "倚竹佳人翠袖长，天寒犹著薄罗裳（苏轼《鹧鸪天》）" },
+                    { id: "D", text: "竹径通幽处，禅房花木深（常建《题破山寺后禅院》）" }
+                ],
+                answer: "B",
+                explanation: "B句以竹影的清瘦雅致勾勒出静谧悠远的意境，竹影相伴、与诗相融，契合竹“柔静淡然、为文人提供心灵安顿”的核心特质；A句仅描摹竹的枝节清丽、姿态轻盈的自然形态，未体现人格内涵；C句以竹为背景衬托佳人形象，竹仅为景物点缀；D句借竹径的幽深营造禅意氛围，侧重环境的清幽，而非竹本身的柔静虚怀的人格象征。"
+            },
+            {
+                q: "7、下列诗句所咏草木，均未体现“比德”传统中人格象征内涵的一项是（）",
+                options: [
+                    { id: "A", text: "接天莲叶无穷碧，映日荷花别样红（杨万里《晓出净慈寺送林子方》）" },
+                    { id: "B", text: "荷尽已无擎雨盖，菊残犹有傲霜枝（苏轼《赠刘景文》）" },
+                    { id: "C", text: "松风吹解带，山月照弹琴（王维《酬张少府》）" },
+                    { id: "D", text: "岂不罹凝寒，松柏有本性（刘桢《赠从弟》）" }
+                ],
+                answer: "A",
+                explanation: "A句仅描绘西湖荷花的盛景，纯写景未赋予人格象征；B句以菊的“傲霜枝”喻坚贞品格，C句以松喻淡然闲适的心境，D句以松柏喻坚贞不屈的本性，均体现“比德”传统。"
+            }
+        ];
+
+        // 主观题数据
+        const subjectiveQuestions = [
+            {
+                poem: "孤松\n唐・柳宗元\n孤松停翠盖，托根临广路。\n不以险自防，遂为明所误。\n幸逢仁惠意，重此藩篱护。\n犹有半心存，时将承雨露。",
+                q: "1、请结合本课“比德”传统与草木人格的相关知识，分析诗歌中“孤松”的人格内涵，并简要赏析诗人以松喻人的艺术手法。（6分）",
+                answer: "①人格内涵：孤松扎根大路旁、不避艰险，却因外形挺拔明秀遭人觊觎，象征诗人自身正直不屈、不趋炎附势的品格，以及被贬谪的坎坷境遇；松虽遭摧折仍“半心存”，期盼承沐雨露，暗含诗人坚守理想、渴望被重用的初心与希冀。（3分）<br><br>②艺术手法：诗人以松的自然特性（扎根广路、挺拔翠秀、遭摧折仍存生机）喻自身的人格与境遇，契合“比德”传统中“观物思德、以物喻人”的核心；托物言志，将自身的坎坷遭遇、理想坚守寄寓于孤松形象中，松的形象与诗人的情志相融，含蓄蕴藉，意蕴深远。（3分）"
+            },
+            {
+                q: "2、梅、兰、竹是古典诗词中最具代表性的草木人格意象，其内涵各有侧重又相融相通。请结合本课所学及古典诗词常识，谈谈你对“梅兰竹合为君子之象”的理解，要求分点阐述，结合具体诗句分析。（8分）",
+                answer: "梅、兰、竹的人格内涵分别彰显了君子品格的不同维度，三者相融，构成传统君子的完整人格体系，故合为君子之象。<br><br>①梅的坚贞不屈是君子的立身之本：陆游“零落成泥碾作尘，只有香如故”，写梅历经磨难仍香气永存，象征君子面对困境、强权，坚守理想与本心，九死不悔。（2分）<br><br>②兰的高洁自持是君子的修身之标：屈原“纫秋兰以为佩”，将兰缀于衣襟，以兰的幽洁喻君子不与世俗同流合污，坚守高洁品德，自持自律。（2分）<br><br>③竹的刚柔并济是君子的处世之智：郑板桥“千磨万击还坚劲”写竹之刚，象征君子自强不息的社会担当；王维“独坐幽篁里”写竹之柔，象征君子虚怀若谷的心灵安顿，刚柔并济是君子应对世事的核心智慧。（2分）<br><br>④三者相融相通：梅、兰、竹均远离尘俗、不媚世俗，共同彰显君子的精神底色；坚贞、高洁、刚柔并济，分别对应君子“立身、修身、处世”的核心追求，缺一不可，共同构成君子的完整人格。（2分）"
+            },
+            {
+                q: "3、中华“比德”传统让梅、兰、竹成为寄寓文人品格追求的经典意象，其承载的精神内核也成为中华民族的文化基因。请结合本课所学的梅、兰、竹的人格内涵，联系学习与生活实际，谈谈其对新时代青年的现实启示。要求：观点明确，条理清晰，不少于200字。（10分）",
+                answer: "梅、兰、竹所寄寓的坚贞不屈、高洁自持、刚柔并济的品格，是中华优秀传统文化的精髓，也为新时代青年的学习生活、品格修养提供了深刻的现实启示。<br><br>梅的坚贞不屈，启示我们面对繁重的学业压力、备考路上的挫折困境时，要坚守初心、矢志不渝，不因一时的困难轻言放弃，始终保持迎难而上的毅力与决心。兰的高洁自持，启示我们在纷繁的校园生活与多样的外界诱惑中，要涵养自身品格、坚守道德底线，不随波逐流、不盲目攀比，始终保持清介自持的本心与纯粹的求学初心。竹的刚柔并济，启示我们既要拥有勇担责任的坚韧，在班级建设、社会志愿活动中主动担当，以实干践行青春价值；又要学会调节心态，面对学业的得失、成长的烦恼时保持淡然从容，懂得安顿心灵，以平和之心应对人生的起伏。<br><br>新时代青年当汲取梅兰竹的品格力量，将其融入日常的学习与生活，以高尚品格立身，以坚韧毅力做事，在青春征途中践行传统君子之道，筑牢成长的根基。"
+            }
+        ];
+
+        function renderObjectiveQuestions() {
+            const container = document.getElementById('objective-container');
+            objectiveQuestions.forEach((q, qIndex) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.innerHTML = `
+                    <div class="q-text">${q.q}</div>
+                    <div class="options" id="options-${qIndex}"></div>
+                    <div class="explanation" id="exp-${qIndex}">
+                        <strong>【答案】${q.answer}</strong><br>
+                        <strong>【解析】</strong>${q.explanation}
+                    </div>
+                `;
+                container.appendChild(card);
+
+                const optionsContainer = document.getElementById(`options-${qIndex}`);
+                q.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerHTML = `<strong>${opt.id}.</strong> &nbsp;${opt.text}`;
+                    
+                    btn.onclick = function() {
+                        // 禁用所有选项
+                        Array.from(optionsContainer.children).forEach(child => child.disabled = true);
+                        
+                        // 检查正确与否
+                        if (opt.id === q.answer) {
+                            btn.classList.add('selected-correct');
+                        } else {
+                            btn.classList.add('selected-wrong');
+                            // 标出正确答案
+                            Array.from(optionsContainer.children).forEach(child => {
+                                if (child.innerHTML.includes(`<strong>${q.answer}.</strong>`)) {
+                                    child.classList.add('show-correct');
+                                }
+                            });
+                        }
+
+                        // 显示解析
+                        document.getElementById(`exp-${qIndex}`).classList.add('visible');
+                    };
+                    optionsContainer.appendChild(btn);
+                });
+            });
+        }
+
+        function renderSubjectiveQuestions() {
+            const container = document.getElementById('subjective-container');
+            subjectiveQuestions.forEach((q, qIndex) => {
+                const card = document.createElement('div');
+                card.className = 'question-card subjective-q';
+                
+                let poemHtml = q.poem ? `<div class="poem-quote">${q.poem}</div>` : '';
+                
+                card.innerHTML = `
+                    ${poemHtml}
+                    <div class="q-text">${q.q}</div>
+                    <button class="show-ans-btn" id="btn-ans-${qIndex}">查看参考答案及解析</button>
+                    <div class="subjective-ans" id="sub-ans-${qIndex}">
+                        <strong>【参考答案】</strong><br>
+                        <p>${q.answer}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                document.getElementById(`btn-ans-${qIndex}`).onclick = function() {
+                    const ansDiv = document.getElementById(`sub-ans-${qIndex}`);
+                    if (ansDiv.classList.contains('visible')) {
+                        ansDiv.classList.remove('visible');
+                        this.innerText = "查看参考答案及解析";
+                    } else {
+                        ansDiv.classList.add('visible');
+                        this.innerText = "收起答案";
+                    }
+                };
+            });
+        }
+
+        // 初始化
+        window.onload = function() {
+            renderObjectiveQuestions();
+            renderSubjectiveQuestions();
+        };
+
+    </script>
+</body>
+</html>

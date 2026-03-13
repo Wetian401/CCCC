@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>比德传统 - 诗词植物意象交互图谱</title>
+    <style>
+        :root {
+            --bg-color: #f7f5f0;
+            --text-color: #2c2c2c;
+            --accent-color: #8a3b3b;
+            --card-bg: #fff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "KaiTi", "STKaiti", "Georgia", serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ========== 顶部导航 ========== */
+        .top-nav {
+            text-align: center;
+            padding: 30px 20px 20px;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .top-nav .back-btn {
+            display: inline-block;
+            padding: 10px 25px;
+            background-color: var(--accent-color);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: background-color 0.3s;
+            font-family: "KaiTi", "STKaiti", serif;
+            font-size: 1rem;
+        }
+
+        .top-nav .back-btn:hover {
+            background-color: #6b2c2c;
+        }
+
+        /* ========== 英雄区 ========== */
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 80px 20px 60px;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(91, 140, 90, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(138, 59, 59, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            letter-spacing: 20px;
+            color: var(--accent-color);
+            font-family: 'STXingkai', 'FZShuTi', 'KaiTi', serif;
+            margin: 0 0 15px 0;
+            font-weight: normal;
+            text-shadow: 2px 3px 6px rgba(138, 59, 59, 0.15);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #777;
+            letter-spacing: 3px;
+            margin: 0;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        /* ========== 主体内容 ========== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            padding: 0 30px;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 50px 60px;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '德';
+            position: absolute;
+            top: -30px;
+            right: -20px;
+            font-size: 18rem;
+            color: rgba(138, 59, 59, 0.03);
+            font-family: 'STXingkai', 'FZShuTi', serif;
+            pointer-events: none;
+            line-height: 1;
+        }
+
+        /* 引言开头 */
+        .lead-text {
+            font-size: 1.35em;
+            line-height: 2;
+            text-indent: 2em;
+            margin-bottom: 30px;
+            color: #3a3a3a;
+            position: relative;
+            padding-left: 20px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* 正文段落 */
+        .body-text {
+            font-size: 1.2em;
+            line-height: 2.2;
+            text-indent: 2em;
+            margin-bottom: 28px;
+            color: #444;
+        }
+
+        /* 经典引用高亮 */
+        .quote-inline {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* 结语 */
+        .closing {
+            text-align: center;
+            font-size: 1.4em;
+            line-height: 2.2;
+            color: var(--accent-color);
+            margin-top: 40px;
+            padding: 30px 20px;
+            border-top: 1px solid rgba(138, 59, 59, 0.15);
+            border-bottom: 1px solid rgba(138, 59, 59, 0.15);
+            letter-spacing: 2px;
+            font-family: 'STXingkai', 'FZShuTi', 'KaiTi', serif;
+        }
+
+        /* ========== 插图区块 ========== */
+        .illus-row {
+            display: flex;
+            gap: 30px;
+            margin: 35px 0;
+            align-items: stretch;
+        }
+
+        .illus-row.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .illus-img-wrap {
+            flex: 0 0 40%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .illus-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .illus-text-wrap {
+            flex: 1 1 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .illus-text-wrap .body-text {
+            margin-bottom: 0;
+        }
+
+        .illus-caption {
+            text-align: center;
+            font-size: 0.9em;
+            color: #999;
+            margin-top: 8px;
+            letter-spacing: 2px;
+        }
+
+        .illus-single {
+            margin: 35px auto;
+            max-width: 60%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .illus-single img {
+            width: 100%;
+            display: block;
+        }
+
+        /* ========== 底部装饰 ========== */
+        .bottom-decor {
+            text-align: center;
+            padding: 40px 20px 60px;
+            color: rgba(138, 59, 59, 0.25);
+            font-size: 1.1rem;
+            letter-spacing: 8px;
+        }
+
+        /* ========== 动画 ========== */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1.2s ease-out both;
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+                letter-spacing: 10px;
+            }
+
+            .content-card {
+                padding: 30px 25px;
+            }
+
+            .lead-text,
+            .body-text {
+                font-size: 1.05em;
+            }
+
+            .closing {
+                font-size: 1.15em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-nav">
+        <a href="index.html" class="back-btn">← 返回首页</a>
+    </div>
+
+    <div class="hero">
+        <h1 class="hero-title">比德传统</h1>
+        <p class="hero-subtitle">以物喻人 · 格物养德 · 草木本心</p>
+    </div>
+
+    <div class="container">
+        <div class="content-card fade-in">
+
+            <p class="lead-text">
+                一草一木，一花一树，虽各有千秋，却同源于深植中华文明数千年的<span class="quote-inline">"比德"</span>传统。
+            </p>
+
+            <!-- 玉 配图 + 荀子引文 -->
+            <div class="illus-row">
+                <div class="illus-img-wrap">
+                    <img src="花草/玉.png" alt="玉">
+                    <p class="illus-caption">夫玉者，君子比德焉</p>
+                </div>
+                <div class="illus-text-wrap">
+                    <p class="body-text">
+                        <span class="quote-inline">《荀子·法行》</span>有言：<span
+                            class="quote-inline">"夫玉者，君子比德焉"</span>，将玉的温润坚洁与君子的品德相映照。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 山水比德 配图 + 孔子引文 -->
+            <div class="illus-row reverse">
+                <div class="illus-img-wrap">
+                    <img src="花草/山水比德.png" alt="山水比德">
+                    <p class="illus-caption">智者乐水，仁者乐山</p>
+                </div>
+                <div class="illus-text-wrap">
+                    <p class="body-text">
+                        孔子亦云<span
+                            class="quote-inline">"智者乐水，仁者乐山"</span>，以山水的灵动与厚重，喻指智者的聪敏、仁者的宽厚。这便是比德的核心：<strong>以物喻人</strong>，将自然之物的特性，与世人的道德情操、精神追求相融相通，让自然之美成为人格之美的具象表达。这种思维，深深浸润了中华诗词的创作脉络，成为文人墨客寄情抒怀、言志托意的重要方式。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 托物言志 配图 -->
+            <div class="illus-row">
+                <div class="illus-img-wrap">
+                    <img src="花草/托物言志.png" alt="托物言志">
+                    <p class="illus-caption">托物言志 · 梅兰竹菊</p>
+                </div>
+                <div class="illus-text-wrap">
+                    <p class="body-text">
+                        草木无言，自有本心；诗词有韵，凝萃人格。从梅的坚贞、兰的高洁、竹的刚柔，到比德传统的文化根基，在本节课中，我们一同解锁了诗词中草木的人格，也读懂了藏在枝叶间的中华文脉。这份植物人格图谱，不仅是古诗文学习中理解<span
+                            class="quote-inline">"托物言志"</span>的核心素材，更藏着中华民族对崇高品格的持续追求，是我们的精神根基。
+                    </p>
+                </div>
+            </div>
+
+            <p class="body-text">
+                今天，我们品读诗词中的草木，不仅是感受古典美学的魅力，更是从中华优秀传统文化中汲取精神力量，在草木人格中照见自我、塑造自我。
+            </p>
+
+            <p class="closing">
+                愿我们皆能以草木为鉴，格万物之性，<br>
+                养浩然之气，守草木本心，赴青春征途。
+            </p>
+
+        </div>
+    </div>
+
+    <div class="bottom-decor">
+        梅 · 兰 · 竹 · 菊
+    </div>
+
+    <script src="ai_assistant.js"></script>
+</body>
+
+</html>
