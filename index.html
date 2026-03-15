@@ -9,11 +9,8 @@
         /* ================= 基础样式设计 ================= */
         :root {
             --bg-color: #f7f5f0;
-            /* 米宣纸色背景 */
             --ink-color: #2c2c2c;
-            /* 水墨黑 */
             --accent-color: #8a3b3b;
-            /* 胭脂红（强调色） */
         }
 
         body {
@@ -22,13 +19,13 @@
             font-family: "KaiTi", "STKaiti", "Georgia", serif;
             background-color: var(--bg-color);
             color: var(--ink-color);
-            height: 100vh;
+            /* 修复1：删除了 height: 100vh 和 overflow: hidden，改为最小高度 */
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow-x: hidden; 
         }
 
-        /* 顶部标题栏 */
         header {
             text-align: center;
             padding: 80px 20px 20px;
@@ -42,22 +39,19 @@
             position: relative;
             display: inline-block;
             text-align: right;
-            /* 让内部的副标题靠右 */
         }
 
+        /* 恢复你原本的超大字号和间距 */
         h1 {
             margin: 0;
             font-weight: normal;
             letter-spacing: 40px;
-            /* 大胆拉开间距 */
             font-size: 8rem;
-            /* 极致放大 */
             color: #4a3b3b;
             font-family: 'STXingkai', 'FZShuTi', 'KaiTi', serif;
             text-shadow: 2px 4px 8px rgba(74, 59, 59, 0.2);
             animation: fadeInDown 1.2s ease-out;
             margin-right: -40px;
-            /* 抵消最后一个字的超大间距以居中 */
             padding-bottom: 10px;
         }
 
@@ -66,38 +60,23 @@
             font-size: 2.2rem;
             margin-top: 5px;
             letter-spacing: 6px;
-            /* 副标题间距重新收紧 */
             font-family: 'KaiTi', serif;
             display: block;
-            /* 占满整行方便右对齐 */
             text-align: right;
             opacity: 0;
             animation: fadeIn 1.5s ease-in 0.8s forwards;
             padding-right: 0;
             margin-right: -6px;
-            /* 抵消最后一个字的间距，实现真正的右侧边缘对齐 */
         }
 
         @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 0.9;
-            }
+            from { opacity: 0; }
+            to { opacity: 0.9; }
         }
 
         /* ================= 主布局 ================= */
@@ -106,9 +85,10 @@
             justify-content: center;
             align-items: center;
             gap: 100px;
-            /* 控制三个圆圈之间的间距 */
             flex: 1;
-            /* 占据剩余全部高度，实现垂直居中 */
+            /* 修复2：允许内容折行，防止小屏幕挤压 */
+            flex-wrap: wrap; 
+            padding: 20px 0;
         }
 
         .plant-item {
@@ -119,15 +99,13 @@
             transition: transform 0.3s ease;
         }
 
-        /* 鼠标悬停时整个项目轻微上浮 */
         .plant-item:hover {
             transform: translateY(-15px);
         }
 
-        /* 圆形按钮样式 */
+        /* 恢复你原本的 320px 大圆圈 */
         .plant-btn {
             width: 320px;
-            /* 进一步放大图标尺寸 */
             height: 320px;
             border-radius: 50%;
             border: 4px solid #d1d1d1;
@@ -142,7 +120,6 @@
             box-shadow: 0 8px 25px rgba(138, 59, 59, 0.4);
         }
 
-        /* 探究比德传统按钮 */
         .bide-btn-container {
             text-align: center;
             margin-top: 5vh;
@@ -185,12 +162,10 @@
             left: 100%;
         }
 
-        /* 确保图片填满圆圈且不露底 */
         .plant-btn img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* 自动裁剪填充，不变形 */
             display: block;
         }
 
@@ -206,17 +181,19 @@
             color: var(--accent-color);
         }
 
-        /* 底部交互提示语 */
         .interaction-hint {
             text-align: center;
             font-size: 1.1rem;
             color: #999;
             letter-spacing: 4px;
             margin-bottom: 50px;
-            opacity: 1;
         }
-        /* 响应式调整 */
+
+        /* ================= 手机端终极适配 ================= */
         @media (max-width: 768px) {
+            /* 修复3：手机端强制变回最普通的块级布局，彻底打破 flex 带来的高度锁死 */
+            body { display: block; }
+            
             h1 {
                 font-size: 3.5rem;
                 letter-spacing: 15px;
@@ -230,11 +207,18 @@
             header {
                 padding: 40px 10px 10px;
             }
+            
+            /* 容器变为 block，植物按顺序往下排 */
             .container {
-                flex-direction: column;
-                gap: 40px;
+                display: block;
                 padding-top: 20px;
+                padding-bottom: 20px;
             }
+            .plant-item {
+                margin: 40px auto; /* 保证上下间距 */
+            }
+            
+            /* 恢复你原本手机端 200px 的设定 */
             .plant-btn {
                 width: 200px;
                 height: 200px;
@@ -247,11 +231,9 @@
                 font-size: 1.1rem;
                 padding: 10px 25px;
             }
-            #ai-float-btn {
-                width: 70px;
-                height: 70px;
-                bottom: 20px;
-                right: 20px;
+            /* 修复4：底部增加安全留白，确保滑到底能完全露出提示语 */
+            .interaction-hint {
+                padding-bottom: 60px;
             }
         }
     </style>
@@ -289,12 +271,10 @@
         </div>
     </div>
 
-    <!-- 比德传统入口 -->
     <div class="bide-btn-container">
         <a href="tradition.html" class="bide-btn">探究比德传统</a>
     </div>
 
-    <!-- 交互提示语 -->
     <div class="interaction-hint">点击上方植物，探索其文学内涵</div>
 
     <script src="ai_assistant.js"></script>
