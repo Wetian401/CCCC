@@ -150,6 +150,22 @@ style.innerHTML = `
     #ai-chat-send:hover {
         background: #6b2c2c;
     }
+
+    /* ================= 手机端自适应缩放调整 ================= */
+    @media (max-width: 768px) {
+        #ai-float-btn {
+            width: 70px;
+            height: 70px;
+            bottom: 20px;
+            right: 20px;
+        }
+        #ai-chat-window {
+            width: 90vw;
+            height: 60vh;
+            bottom: 20px;
+            right: 5vw;
+        }
+    }
 `;
 document.head.appendChild(style);
 
@@ -182,132 +198,13 @@ const sendBtn = document.getElementById('ai-chat-send');
 const inputField = document.getElementById('ai-chat-input');
 const messagesArea = document.getElementById('ai-chat-messages');
 
-// 切换窗口显示
+// 切换窗口显示（手机端隐藏按钮防止遮挡）
 floatBtn.addEventListener('click', () => {
-    chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
-    if (chatWindow.style.display === 'flex') {
-        inputField.focus();
-    }
+    chatWindow.style.display = 'flex';
+    floatBtn.style.display = 'none'; // 新增：打开时隐藏浮窗按钮
+    inputField.focus();
 });
 closeBtn.addEventListener('click', () => {
     chatWindow.style.display = 'none';
+    floatBtn.style.display = 'flex'; // 新增：关闭时恢复浮窗按钮
 });
-
-// 简易 Markdown 转 HTML
-function simpleMarkdown(text) {
-    // 代码块
-    text = text.replace(/```([\s\S]*?)```/g, '<pre style="background:#f5f0ea;padding:10px;border-radius:6px;overflow-x:auto;font-size:0.9em;"><code>$1</code></pre>');
-    // 行内代码
-    text = text.replace(/`([^`]+)`/g, '<code style="background:#f5f0ea;padding:2px 5px;border-radius:3px;font-size:0.9em;">$1</code>');
-    // 加粗
-    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    // 标题 (### ## #)
-    text = text.replace(/^### (.+)$/gm, '<strong style="display:block;margin:10px 0 5px;font-size:1.05em;">$1</strong>');
-    text = text.replace(/^## (.+)$/gm, '<strong style="display:block;margin:12px 0 5px;font-size:1.1em;">$1</strong>');
-    text = text.replace(/^# (.+)$/gm, '<strong style="display:block;margin:14px 0 6px;font-size:1.15em;">$1</strong>');
-    // 无序列表
-    text = text.replace(/^[\-\*] (.+)$/gm, '<div style="padding-left:1em;">• $1</div>');
-    // 有序列表
-    text = text.replace(/^(\d+)\. (.+)$/gm, '<div style="padding-left:1em;">$1. $2</div>');
-    // 段落：连续两个换行变为分段
-    text = text.replace(/\n\n+/g, '</p><p style="margin:8px 0;">');
-    // 单个换行变为 <br>
-    text = text.replace(/\n/g, '<br>');
-    // 包裹在 p 标签中
-    text = '<p style="margin:0;">' + text + '</p>';
-    return text;
-}
-
-// 添加消息到面板
-function appendMessage(text, isUser) {
-    const msgDiv = document.createElement('div');
-    msgDiv.className = isUser ? 'user-msg' : 'ai-msg';
-
-    if (isUser) {
-        msgDiv.textContent = text;
-    } else {
-        msgDiv.innerHTML = simpleMarkdown(text);
-    }
-
-    messagesArea.appendChild(msgDiv);
-    messagesArea.scrollTop = messagesArea.scrollHeight;
-}
-
-// 发送消息处理
-async function sendMessage() {
-    const text = inputField.value.trim();
-    if (!text) return;
-
-    appendMessage(text, true);
-    inputField.value = '';
-
-    // 显示加载中
-    const loadingId = 'loading-' + Date.now();
-    const loadDiv = document.createElement('div');
-    loadDiv.className = 'ai-msg';
-    loadDiv.id = loadingId;
-    loadDiv.innerHTML = '<span style="color: #999;">正在思考，请稍候...</span>';
-    messagesArea.appendChild(loadDiv);
-    messagesArea.scrollTop = messagesArea.scrollHeight;
-
-    try {
-        const reply = await callDeepSeekAPI(text);
-        document.getElementById(loadingId).remove();
-        appendMessage(reply, false);
-    } catch (error) {
-        document.getElementById(loadingId).remove();
-        appendMessage("抱歉，API 连接出现问题，请检查网络或后端的 API 配置是否正确。", false);
-        console.error("AI 助手报错:", error);
-    }
-}
-
-sendBtn.addEventListener('click', sendMessage);
-inputField.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
-});
-
-// ======================================================================
-//  请在此处填入DeepSeek API 配置
-// ======================================================================
-
-const DEEPSEEK_API_KEY = 'sk-debfa3635b214955ba5f0863e95e3ddf'; // 替换为 DeepSeek API Key (例如 'sk-abcd1234...')
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions'; // DeepSeek 官方调用接口
-
-// ======================================================================
-
-async function callDeepSeekAPI(userMessage) {
-    // 防呆检测，若未配置则直接返回提示
-    if (DEEPSEEK_API_KEY === 'YOUR_API_KEY_HERE' || !DEEPSEEK_API_KEY) {
-        return "⚠️ **提示**：目前尚未配置 DeepSeek API Key。<br><br>请用编辑器打开 `ai_assistant.js` 文件，在第 170 行左右找到 `DEEPSEEK_API_KEY` 变量，填入您的真实密钥即可启用 AI 问答功能。";
-    }
-
-    const response = await fetch(DEEPSEEK_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
-        },
-        body: JSON.stringify({
-            model: "deepseek-chat", // 使用 deepseek-chat 或 deepseek-reasoner
-            messages: [
-                {
-                    "role": "system",
-                    "content": "你是一个知识渊博的 AI 助手，擅长中国古典诗词、植物意象及比德传统相关的知识。请用正常语气回答，条理清晰，适当分段，重点突出。"
-                },
-                {
-                    "role": "user",
-                    "content": userMessage
-                }
-            ],
-            temperature: 0.6
-        })
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`HTTP API 错误 ${response.status}: ${JSON.stringify(errorData)}`);
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-}
