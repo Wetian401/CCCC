@@ -52,7 +52,6 @@
         }
 
         #graphArea {
-            /* 修复留白：高度从900px缩减为750px */
             min-width: 1100px;
             min-height: 750px; 
             width: 100%;
@@ -119,6 +118,7 @@
 </head>
 
 <body>
+
     <a href="index.html" class="back-btn">← 返回首页</a>
 
     <div id="scrollWrapper">
@@ -257,9 +257,11 @@
             }
         }
 
+        /* === 梅花图谱：已升级精美排版 === */
         function renderPlumGraph(data, centerX, centerY) {
-            const radiusX = Math.min(centerX, centerY) * 0.9;
-            const gapY = 160;
+            // 1. 拉大间距，防止文字和连线挤压
+            const radiusX = Math.min(centerX, centerY) * 1.05; 
+            const gapY = 175; 
 
             const bgLeft = document.createElement('div');
             bgLeft.className = 'bg-decor bg-left';
@@ -286,15 +288,45 @@
                 createNodeAndLine(item, centerX, centerY, x, y, 'plum');
             });
 
-            drawArrow(centerX - 100, centerY + (gapY * 1.5), centerX + 100, centerY + (gapY * 1.5), "精神转变");
+            // 2. 新增顶部水印大字（对标竹子的“君子之风”）
+            const decorTopText = document.createElement('div');
+            decorTopText.className = 'transition-text';
+            decorTopText.innerHTML = '傲骨寒香';
+            decorTopText.style.color = 'rgba(138, 59, 59, 0.08)';
+            decorTopText.style.fontSize = '3.5rem';
+            decorTopText.style.fontFamily = "'FZZJ-ZTXKJW', 'STZhuan', 'FZZhuanTi-S01S', 'LiSu', cursive";
+            decorTopText.style.letterSpacing = '15px';
+            decorTopText.style.whiteSpace = 'nowrap';
+            decorTopText.style.left = (centerX - 180) + 'px'; 
+            decorTopText.style.top = '40px';
+            decorTopText.style.width = '360px';
+            decorTopText.style.textAlign = 'center';
+            decorTopText.style.animation = 'expandOut 1.2s forwards';
+            graphArea.appendChild(decorTopText);
 
+            // 3. 将中间挡路的文字移到顶部安全区
             const transitionEl = document.createElement('div');
             transitionEl.className = 'transition-text';
             transitionEl.innerHTML = '从“孤芳自赏”的超然<br>到“零落成泥”的悲壮';
-            transitionEl.style.left = (centerX - 100) + 'px';
-            transitionEl.style.top = (centerY - gapY * 0.8) + 'px';
-            transitionEl.style.width = '200px';
+            transitionEl.style.fontSize = '1.3rem';
+            transitionEl.style.left = (centerX - 150) + 'px';
+            transitionEl.style.top = (centerY - 130) + 'px';
+            transitionEl.style.width = '300px';
             graphArea.appendChild(transitionEl);
+
+            // 4. 优化底部箭头位置
+            drawArrow(centerX - 160, centerY + (gapY * 1.25), centerX + 160, centerY + (gapY * 1.25), "精神转变", 0, -10);
+
+            // 5. 新增底部对称的副标题
+            const bottomText = document.createElement('div');
+            bottomText.className = 'transition-text';
+            bottomText.innerHTML = '文人精神境遇的自我投射';
+            bottomText.style.fontSize = '1.2rem';
+            bottomText.style.color = '#7a4343';
+            bottomText.style.left = (centerX - 150) + 'px';
+            bottomText.style.top = (centerY + (gapY * 1.25) + 15) + 'px';
+            bottomText.style.width = '300px';
+            graphArea.appendChild(bottomText);
 
             addPlumBlossoms(centerX, centerY);
         }
