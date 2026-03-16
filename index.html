@@ -19,45 +19,50 @@
             font-family: "KaiTi", "STKaiti", "Georgia", serif;
             background-color: var(--bg-color);
             color: var(--ink-color);
-            /* 彻底移除 height: 100vh 和 overflow: hidden */
-            /* 彻底移除 body 的 flex 布局，回归最原始的块级自然滚动 */
-            min-height: 100vh;
-            overflow-x: hidden; /* 仅防止横向溢出 */
+            /* 终极修复：彻底移除高度和 overflow 限制，唤醒手机原生滚动 */
+            width: 100%;
+            -webkit-overflow-scrolling: touch; /* 专门针对 iOS/微信 的顺滑滚动指令 */
         }
 
-        /* 顶部标题栏 */
         header {
             text-align: center;
-            padding: 8vh 20px 20px;
-            z-index: 10;
+            padding: 80px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .title-group {
             position: relative;
             display: inline-block;
-            text-align: center;
+            text-align: right;
         }
 
         h1 {
             margin: 0;
             font-weight: normal;
-            letter-spacing: 20px;
-            font-size: 6rem; /* 稍微缩小一点防止手机端爆屏 */
+            letter-spacing: 40px;
+            font-size: 8rem; /* 保持你的震撼大字号 */
             color: #4a3b3b;
             font-family: 'STXingkai', 'FZShuTi', 'KaiTi', serif;
             text-shadow: 2px 4px 8px rgba(74, 59, 59, 0.2);
             animation: fadeInDown 1.2s ease-out;
+            /* 关键修复：用 padding-left 抵消字间距，不产生负边距超宽截断，网页就不会被锁死了 */
+            padding-left: 40px;
             padding-bottom: 10px;
         }
 
         p.subtitle {
             color: #8a3b3b;
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             margin-top: 5px;
             letter-spacing: 6px;
             font-family: 'KaiTi', serif;
+            display: block;
+            text-align: right;
             opacity: 0;
             animation: fadeIn 1.5s ease-in 0.8s forwards;
+            padding-left: 6px; /* 替代负边距 */
         }
 
         @keyframes fadeInDown {
@@ -75,10 +80,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-wrap: wrap; /* 允许植物图标在小屏幕下自动换行/上下排列 */
-            gap: 6vw; /* 间距改为相对单位 */
-            padding: 40px 20px;
-            max-width: 1200px;
+            flex-wrap: wrap; /* 核心：屏幕不够宽时自动换行，绝不挤压变形 */
+            gap: 80px;
+            padding: 20px 20px 60px 20px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -88,17 +93,15 @@
             align-items: center;
             cursor: pointer;
             transition: transform 0.3s ease;
-            margin-bottom: 20px;
         }
 
         .plant-item:hover {
             transform: translateY(-15px);
         }
 
-        /* 圆形按钮样式 */
         .plant-btn {
-            width: 280px;
-            height: 280px;
+            width: 320px; /* 保持你的大气圆圈尺寸 */
+            height: 320px;
             border-radius: 50%;
             border: 4px solid #d1d1d1;
             transition: all 0.3s ease;
@@ -121,7 +124,7 @@
 
         .plant-name {
             margin-top: 25px;
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
             color: var(--ink-color);
             transition: color 0.3s ease;
@@ -131,10 +134,10 @@
             color: var(--accent-color);
         }
 
-        /* 探究比德传统按钮 */
         .bide-btn-container {
             text-align: center;
-            margin: 40px 0 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         .bide-btn {
@@ -159,50 +162,43 @@
             color: #fff;
         }
 
-        /* 底部交互提示语 */
         .interaction-hint {
             text-align: center;
             font-size: 1.1rem;
             color: #999;
             letter-spacing: 4px;
-            padding-bottom: 80px; /* 底部留出充足的空白，确保能滑到底 */
+            padding-bottom: 150px; /* 留足超大底部空间给悬浮球 */
         }
 
-        /* ================= 手机端响应式调整 ================= */
+        /* ================= 手机端原汁原味适配 ================= */
         @media (max-width: 768px) {
-            header {
-                padding: 40px 10px 10px;
-            }
+            header { padding: 40px 10px 10px; }
             h1 {
                 font-size: 3.5rem;
-                letter-spacing: 10px;
+                letter-spacing: 15px;
+                padding-left: 15px;
             }
             p.subtitle {
                 font-size: 1.2rem;
                 letter-spacing: 3px;
+                padding-left: 3px;
             }
             .container {
-                flex-direction: column; /* 手机上强制竖向排列 */
-                gap: 30px;
-                padding: 20px 10px;
+                flex-direction: column; /* 手机端垂直排列 */
+                gap: 40px;
+                padding-top: 20px;
             }
             .plant-btn {
-                width: 220px;
-                height: 220px;
+                width: 200px; /* 恢复你手机端设计的尺寸 */
+                height: 200px;
             }
             .plant-name {
                 font-size: 1.6rem;
-                margin-top: 15px;
-            }
-            .bide-btn-container {
-                margin: 20px 0;
+                margin-top: 10px;
             }
             .bide-btn {
                 font-size: 1.1rem;
-                padding: 12px 28px;
-            }
-            .interaction-hint {
-                padding-bottom: 100px; /* 手机端留白更多一点，防遮挡 */
+                padding: 10px 25px;
             }
         }
     </style>
