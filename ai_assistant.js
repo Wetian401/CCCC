@@ -35,7 +35,7 @@ style.innerHTML = `
     /* 对话框样式 */
     #ai-chat-window {
         position: fixed;
-        bottom: 110px;
+        bottom: 40px; /* 降低底部距离 */
         right: 40px;
         width: 380px;
         height: 550px;
@@ -160,10 +160,10 @@ style.innerHTML = `
             right: 20px;
         }
         #ai-chat-window {
-            width: 90vw;
-            height: 60vh;
-            bottom: 20px;
-            right: 5vw;
+            width: 90vw;       /* 手机端占屏幕宽度的 90% */
+            height: 70vh;      /* 手机端占屏幕高度的 70% */
+            bottom: 5vh;       /* 居中偏下显示 */
+            right: 5vw;        /* 左右居中对齐 */
         }
     }
 `;
@@ -198,13 +198,13 @@ const sendBtn = document.getElementById('ai-chat-send');
 const inputField = document.getElementById('ai-chat-input');
 const messagesArea = document.getElementById('ai-chat-messages');
 
-// 切换窗口显示（手机端隐藏按钮防止遮挡）
+// === 核心修复：点击打开时隐藏悬浮球，点击关闭时恢复悬浮球 ===
 floatBtn.addEventListener('click', () => {
     chatWindow.style.display = 'flex';
-    floatBtn.style.display = 'none'; // 新增：打开时隐藏浮窗按钮
+    floatBtn.style.display = 'none'; // 隐藏悬浮球，防止遮挡
     inputField.focus();
 });
 closeBtn.addEventListener('click', () => {
     chatWindow.style.display = 'none';
-    floatBtn.style.display = 'flex'; // 新增：关闭时恢复浮窗按钮
+    floatBtn.style.display = 'flex'; // 恢复悬浮球
 });
