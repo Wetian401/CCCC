@@ -35,7 +35,7 @@ style.innerHTML = `
     /* 对话框样式 */
     #ai-chat-window {
         position: fixed;
-        bottom: 40px; /* 降低底部距离 */
+        bottom: 40px;
         right: 40px;
         width: 380px;
         height: 550px;
@@ -180,7 +180,7 @@ const chatHTML = `
             <span id="ai-chat-close" title="关闭">✖</span>
         </div>
         <div id="ai-chat-messages">
-            <div class="ai-msg">你好！我是诗词意象与比德传统的专属 AI 助手。关于梅、兰、竹、菊的文化内涵，或者如何理解"托物言志"，随时问我吧。</div>
+            <div class="ai-msg">你好！我是诗词意象与比德传统的专属 AI 助手。关于梅、兰、竹的文化内涵，或者如何理解"托物言志"，随时问我吧。</div>
         </div>
         <div id="ai-chat-input-area">
             <input type="text" id="ai-chat-input" placeholder="输入你想探讨的话题...">
@@ -190,7 +190,7 @@ const chatHTML = `
 `;
 document.body.insertAdjacentHTML('beforeend', chatHTML);
 
-// 3. 逻辑绑定与 DeepSeek API 调用
+// 3. 逻辑绑定与配置
 const floatBtn = document.getElementById('ai-float-btn');
 const chatWindow = document.getElementById('ai-chat-window');
 const closeBtn = document.getElementById('ai-chat-close');
@@ -198,13 +198,97 @@ const sendBtn = document.getElementById('ai-chat-send');
 const inputField = document.getElementById('ai-chat-input');
 const messagesArea = document.getElementById('ai-chat-messages');
 
-// === 核心修复：点击打开时隐藏悬浮球，点击关闭时恢复悬浮球 ===
+// === 窗口开关逻辑 ===
 floatBtn.addEventListener('click', () => {
     chatWindow.style.display = 'flex';
     floatBtn.style.display = 'none'; // 隐藏悬浮球，防止遮挡
     inputField.focus();
 });
+
 closeBtn.addEventListener('click', () => {
     chatWindow.style.display = 'none';
     floatBtn.style.display = 'flex'; // 恢复悬浮球
+});
+
+// === DeepSeek API 配置 ===
+const API_KEY = "sk-debfa3635b214955ba5f0863e95e3ddf"; // 你提供的 API Key
+
+// 设定 AI 的系统身份，融入了你的网页内容，确保它答题专业
+const SYSTEM_PROMPT = `你是一个专门辅助学生学习《诗词中的植物人格图谱》的专属AI助手。
+你的知识库内容如下：
+1. 梅：林逋的隐逸之姿（疏影横斜水清浅）与陆游的志士之魂（零落成泥碾作尘）。
+2. 兰：屈原定义的“高洁自持”（纫秋兰以为佩），不与世俗同流合污。
+3. 竹：郑板桥的坚韧担当（咬定青山）与王维的心灵安顿（独坐幽篁）。
+4. 比德传统：将自然特性与道德情操相融，“智者乐水，仁者乐山”，托物言志。
+请根据上述内容回答学生的问题。语言要亲切、优美、富有文学气息。如果用户问无关内容，请温柔地引导回诗词和植物话题。`;
+
+// === 核心：真实的发送与 API 调用逻辑 ===
+async function sendMessage() {
+    const text = inputField.value.trim();
+    if (!text) return; // 输入为空直接返回
+
+    // 1. 显示用户消息
+    const userMsgDiv = document.createElement('div');
+    userMsgDiv.className = 'user-msg';
+    userMsgDiv.textContent = text;
+    messagesArea.appendChild(userMsgDiv);
+
+    // 2. 清空输入框并滚动到底部
+    inputField.value = '';
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+
+    // 3. 显示 AI 正在输入的状态
+    const aiMsgDiv = document.createElement('div');
+    aiMsgDiv.className = 'ai-msg';
+    aiMsgDiv.innerHTML = '<span style="color:#999; font-size: 0.9em;">AI 正在研墨思考中...</span>';
+    messagesArea.appendChild(aiMsgDiv);
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+
+    // 4. 调用 DeepSeek API
+    try {
+        const response = await fetch("https://api.deepseek.com/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "deepseek-chat", // 使用 DeepSeek 的对话模型
+                messages: [
+                    { role: "system", content: SYSTEM_PROMPT },
+                    { role: "user", content: text }
+                ],
+                temperature: 0.7 // 稍微增加一点文学创造性
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP 错误! 状态码: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const aiReply = data.choices[0].message.content;
+
+        // 5. 替换掉“思考中”的状态，显示真实回答
+        aiMsgDiv.innerHTML = '';
+        aiMsgDiv.textContent = aiReply;
+
+    } catch (error) {
+        console.error("API 调用失败:", error);
+        aiMsgDiv.innerHTML = '';
+        aiMsgDiv.textContent = "抱歉，由于山高水远，网络似乎断开了。请稍后再试。";
+    }
+
+    // 6. 回复完毕后再次滚动到底部
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+// 绑定点击发送按钮事件
+sendBtn.addEventListener('click', sendMessage);
+
+// 绑定在输入框内按“回车键”发送事件
+inputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
 });
