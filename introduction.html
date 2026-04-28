@@ -128,7 +128,6 @@
             gap: 40px;
             align-items: stretch;
             min-height: 600px;
-            /* 继续增加高度让国画展现完全 */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             border-radius: 4px;
         }
@@ -453,16 +452,16 @@
         const urlParams = new URLSearchParams(window.location.search);
         let currentPlant = urlParams.get('plant');
 
-        // 如果没有 plant 参数，尝试看有没有 hash (降级兼容)
+       
         if (!currentPlant && window.location.hash) {
             currentPlant = window.location.hash.substring(1);
         }
 
         if (currentPlant) {
-            // 设置返回图谱的正确链接
+      
             document.getElementById('backToGraphBtn').href = `graph.html?plant=${currentPlant}`;
 
-            // 隐藏所有不是当前植物的区块
+          
             const allSections = document.querySelectorAll('.plant-section');
             allSections.forEach(section => {
                 if (section.id !== currentPlant) {

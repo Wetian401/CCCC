@@ -1,6 +1,6 @@
-// ai_assistant.js
 
-// 1. 注入 CSS 样式
+
+// CSS 
 const style = document.createElement('style');
 style.innerHTML = `
     /* 悬浮球样式 */
@@ -160,8 +160,8 @@ style.innerHTML = `
             right: 20px;
         }
         #ai-chat-window {
-            width: 90vw;       /* 手机端占屏幕宽度的 90% */
-            height: 70vh;      /* 手机端占屏幕高度的 70% */
+            width: 90vw;       /* 手机端占屏幕宽度的 多少*/
+            height: 70vh;      /* 手机端占屏幕高度的 多少 */
             bottom: 5vh;       /* 居中偏下显示 */
             right: 5vw;        /* 左右居中对齐 */
         }
@@ -169,7 +169,7 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-// 2. 注入 HTML 结构
+//  HTML 结构
 const chatHTML = `
     <div id="ai-float-btn" title="唤醒 AI 助手">
         <img src="花草/古风小人.png" alt="AI助手" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
@@ -190,7 +190,7 @@ const chatHTML = `
 `;
 document.body.insertAdjacentHTML('beforeend', chatHTML);
 
-// 3. 逻辑绑定与配置
+// 逻辑绑定与配置
 const floatBtn = document.getElementById('ai-float-btn');
 const chatWindow = document.getElementById('ai-chat-window');
 const closeBtn = document.getElementById('ai-chat-close');
@@ -198,16 +198,16 @@ const sendBtn = document.getElementById('ai-chat-send');
 const inputField = document.getElementById('ai-chat-input');
 const messagesArea = document.getElementById('ai-chat-messages');
 
-// === 窗口开关逻辑 ===
+
 floatBtn.addEventListener('click', () => {
     chatWindow.style.display = 'flex';
-    floatBtn.style.display = 'none'; // 隐藏悬浮球，防止遮挡
+    floatBtn.style.display = 'none'; 
     inputField.focus();
 });
 
 closeBtn.addEventListener('click', () => {
     chatWindow.style.display = 'none';
-    floatBtn.style.display = 'flex'; // 恢复悬浮球
+    floatBtn.style.display = 'flex'; 
 });
 
 // === DeepSeek API 配置 ===
@@ -221,6 +221,8 @@ const SYSTEM_PROMPT = `你是一个专门辅助学生学习《诗词中的植物
 3. 竹：郑板桥的坚韧担当（咬定青山）与王维的心灵安顿（独坐幽篁）。
 4. 比德传统：将自然特性与道德情操相融，“智者乐水，仁者乐山”，托物言志。
 请根据上述内容回答学生的问题。语言要亲切、优美、富有文学气息。如果用户问无关内容，请温柔地引导回诗词和植物话题。`;
+      
+// AI辅助生成：DeepSeek-V3.2, 2026-3-20
 
 // === 核心：真实的发送与 API 调用逻辑 ===
 async function sendMessage() {

@@ -11,6 +11,7 @@
             --bg-color: #f7f5f0;
             --ink-color: #2c2c2c;
             --accent-color: #8a3b3b;
+            --feedback-color: #b58169; /* 新增反馈按钮颜色 */
         }
 
         body {
@@ -19,9 +20,8 @@
             font-family: "KaiTi", "STKaiti", "Georgia", serif;
             background-color: var(--bg-color);
             color: var(--ink-color);
-            /* 终极修复：彻底移除高度和 overflow 限制，唤醒手机原生滚动 */
             width: 100%;
-            -webkit-overflow-scrolling: touch; /* 专门针对 iOS/微信 的顺滑滚动指令 */
+            -webkit-overflow-scrolling: touch; 
         }
 
         header {
@@ -42,12 +42,11 @@
             margin: 0;
             font-weight: normal;
             letter-spacing: 40px;
-            font-size: 8rem; /* 保持你的震撼大字号 */
+            font-size: 8rem; 
             color: #4a3b3b;
             font-family: 'STXingkai', 'FZShuTi', 'KaiTi', serif;
             text-shadow: 2px 4px 8px rgba(74, 59, 59, 0.2);
             animation: fadeInDown 1.2s ease-out;
-            /* 关键修复：用 padding-left 抵消字间距，不产生负边距超宽截断，网页就不会被锁死了 */
             padding-left: 40px;
             padding-bottom: 10px;
         }
@@ -62,7 +61,7 @@
             text-align: right;
             opacity: 0;
             animation: fadeIn 1.5s ease-in 0.8s forwards;
-            padding-left: 6px; /* 替代负边距 */
+            padding-left: 6px; 
         }
 
         @keyframes fadeInDown {
@@ -80,7 +79,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-wrap: wrap; /* 核心：屏幕不够宽时自动换行，绝不挤压变形 */
+            flex-wrap: wrap; 
             gap: 80px;
             padding: 20px 20px 60px 20px;
             max-width: 1400px;
@@ -100,7 +99,7 @@
         }
 
         .plant-btn {
-            width: 320px; /* 保持你的大气圆圈尺寸 */
+            width: 320px; 
             height: 320px;
             border-radius: 50%;
             border: 4px solid #d1d1d1;
@@ -134,32 +133,52 @@
             color: var(--accent-color);
         }
 
-        .bide-btn-container {
+        /* 按钮容器样式 */
+        .action-btns-container {
             text-align: center;
             margin-top: 20px;
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* 两个按钮之间的间距 */
         }
 
-        .bide-btn {
+        .btn-common {
             display: inline-block;
             padding: 12px 36px;
-            background-color: var(--accent-color);
             color: #fff;
             text-decoration: none;
             font-size: 1.4rem;
             border-radius: 40px;
             letter-spacing: 2px;
-            box-shadow: 0 4px 12px rgba(138, 59, 59, 0.3);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+        }
+
+        .bide-btn {
+            background-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(138, 59, 59, 0.3);
         }
 
         .bide-btn:hover {
             background-color: #6b2c2c;
             transform: translateY(-3px);
             box-shadow: 0 6px 18px rgba(138, 59, 59, 0.5);
-            color: #fff;
+        }
+
+        /* 反馈按钮专属样式 */
+        .feedback-btn {
+            background-color: var(--feedback-color);
+            box-shadow: 0 4px 12px rgba(181, 129, 105, 0.3);
+            font-size: 1.2rem; /* 稍微小一点，突出主次 */
+            border: 2px dashed rgba(255, 255, 255, 0.3); /* 增加虚线边缘感 */
+        }
+
+        .feedback-btn:hover {
+            background-color: #966b56;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(181, 129, 105, 0.5);
         }
 
         .interaction-hint {
@@ -167,10 +186,9 @@
             font-size: 1.1rem;
             color: #999;
             letter-spacing: 4px;
-            padding-bottom: 150px; /* 留足超大底部空间给悬浮球 */
+            padding: 40px 0 100px 0; 
         }
 
-        /* ================= 手机端原汁原味适配 ================= */
         @media (max-width: 768px) {
             header { padding: 40px 10px 10px; }
             h1 {
@@ -184,19 +202,19 @@
                 padding-left: 3px;
             }
             .container {
-                flex-direction: column; /* 手机端垂直排列 */
+                flex-direction: column; 
                 gap: 40px;
                 padding-top: 20px;
             }
             .plant-btn {
-                width: 200px; /* 恢复你手机端设计的尺寸 */
+                width: 200px; 
                 height: 200px;
             }
             .plant-name {
                 font-size: 1.6rem;
                 margin-top: 10px;
             }
-            .bide-btn {
+            .btn-common {
                 font-size: 1.1rem;
                 padding: 10px 25px;
             }
@@ -236,8 +254,9 @@
         </div>
     </div>
 
-    <div class="bide-btn-container">
-        <a href="tradition.html" class="bide-btn">探究比德传统</a>
+    <div class="action-btns-container">
+        <a href="tradition.html" class="btn-common bide-btn">探究比德传统</a>
+        <a href="feedback.html" class="btn-common feedback-btn">课后反馈入口</a>
     </div>
 
     <div class="interaction-hint">点击上方植物，探索其文学内涵</div>
