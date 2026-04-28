@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课后反馈 - 诗词植物意象</title>
+    <style>
+        :root {
+            /* 宣纸背景色 */
+            --paper-bg: #F8F5EE; 
+            /* 宣纸框颜色 */
+            --xuan-box: #F4F0E6; 
+            --ink-black: #1a1a1a;
+            --border-dark: #5c4b41; /* 深棕色边框 */
+            --btn-brown: #AD7D66; 
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "KaiTi", "STKaiti", "Georgia", serif;
+            background-color: var(--paper-bg);
+            /* 模拟点阵宣纸纹理 */
+            background-image: radial-gradient(#d5cebd 1.2px, transparent 1.2px);
+            background-size: 25px 25px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 70px 20px 40px;
+            position: relative;
+        }
+
+        /* === 真正的图片水墨标题 === */
+        .ink-title-wrap {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-width: 350px;
+            min-height: 120px;
+            background-image: url('花草/de4354e390c135ae5aff8d67d7236b8c.png'); 
+            background-size: 100% 100%; /* 让墨迹拉伸填满这个区域 */
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #ffffff; /* 墨迹上的白色文字 */
+            margin: 0;
+            letter-spacing: 15px;
+            font-family: 'STXingkai', 'FZShuTi', 'KaiTi', serif;
+            font-weight: normal;
+            transform: translateY(-5px); 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            padding: 8px 20px;
+            border: 1.5px solid var(--border-dark);
+            text-decoration: none;
+            color: var(--border-dark);
+            border-radius: 30px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: var(--border-dark);
+            color: #fff;
+        }
+
+        /* === 宣纸反馈框设计 === */
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 20px 20px 100px;
+        }
+
+        .form-card {
+            background-color: var(--xuan-box);
+            border: 3px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 60px 50px;
+            width: 100%;
+            max-width: 800px; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .form-card::after {
+            content: '';
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 1px solid rgba(92, 75, 65, 0.3);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .input-group {
+            margin-bottom: 35px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 16px 25px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            border: 1px solid rgba(92, 75, 65, 0.3);
+            border-radius: 40px; 
+            background-color: rgba(255, 255, 255, 0.6);
+            color: #333;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 25px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            border: 1px solid rgba(92, 75, 65, 0.3);
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.6);
+            color: #333;
+            outline: none;
+            min-height: 250px; 
+            resize: vertical;
+            line-height: 1.8;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: var(--border-dark);
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(92, 75, 65, 0.1);
+        }
+
+        /* === 提交按钮样式 === */
+        .submit-btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .submit-btn {
+            background-color: var(--btn-brown);
+            color: white;
+            border: none;
+            padding: 14px 60px;
+            font-size: 1.4rem;
+            font-family: inherit;
+            border-radius: 40px;
+            cursor: pointer;
+            letter-spacing: 6px;
+            transition: all 0.3s;
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            outline: 2px solid var(--btn-brown);
+            outline-offset: -2px;
+            box-shadow: 0 6px 15px rgba(173, 125, 102, 0.3);
+        }
+
+        .submit-btn:hover {
+            background-color: #9c6c55;
+            outline-color: #9c6c55;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(173, 125, 102, 0.4);
+        }
+
+        #success-msg {
+            display: none;
+            text-align: center;
+            color: var(--border-dark);
+            font-size: 1.3rem;
+            margin-top: 25px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; letter-spacing: 6px; }
+            .form-card { padding: 40px 25px; }
+            .back-btn { top: 20px; left: 20px; }
+            .ink-title-wrap { min-width: 250px; min-height: 90px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="javascript:history.back()" class="back-btn">← 返回</a>
+        <div class="ink-title-wrap">
+            <h1>课后反馈</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-card">
+            <form id="feedbackForm" action="https://formsubmit.co/el/sozopo" method="POST">
+                
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="您的姓名" required>
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" name="contact" placeholder="联系方式（手机/微信）" required>
+                </div>
+                
+                <div class="input-group">
+                    <input type="email" name="email" placeholder="联系邮箱">
+                </div>
+                
+                <div class="input-group">
+                    <textarea name="question" placeholder="请写下您的疑问或建议..." required></textarea>
+                </div>
+
+                <div class="submit-btn-container">
+                    <button type="submit" class="submit-btn">确认提交</button>
+                </div>
+
+                <div id="success-msg">
+                    <p>提交成功！感谢您的反馈。</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="ai_assistant.js"></script>
+    <script>
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // 阻止页面跳转
+            const btn = document.querySelector('.submit-btn');
+            const msg = document.getElementById('success-msg');
+            
+            btn.innerText = '提交中...';
+            btn.style.opacity = '0.8';
+            btn.disabled = true;
+
+            const formData = new FormData(this);
+
+            // 使用 fetch 真实发送数据到 FormSubmit 的 AJAX 接口
+            fetch('https://formsubmit.co/ajax/547483626@qq.com', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 请求成功
+                btn.style.display = 'none';
+                msg.style.display = 'block';
+            })
+            .catch(error => {
+                // 请求失败（网络断开等情况）
+                console.error('Error:', error);
+                btn.innerText = '确认提交';
+                btn.style.opacity = '1';
+                btn.disabled = false;
+                alert('抱歉，网络连接异常，提交失败。');
+            });
+        });
+    </script>
+</body>
+
+</html>
