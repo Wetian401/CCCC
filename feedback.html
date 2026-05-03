@@ -7,12 +7,12 @@
     <title>课后反馈 - 诗词植物意象</title>
     <style>
         :root {
-            /* 宣纸背景色 */
+            
             --paper-bg: #F8F5EE; 
-            /* 宣纸框颜色 */
+            
             --xuan-box: #F4F0E6; 
             --ink-black: #1a1a1a;
-            --border-dark: #5c4b41; /* 深棕色边框 */
+            --border-dark: #5c4b41; 
             --btn-brown: #AD7D66; 
         }
 
@@ -21,7 +21,6 @@
             padding: 0;
             font-family: "KaiTi", "STKaiti", "Georgia", serif;
             background-color: var(--paper-bg);
-            /* 模拟点阵宣纸纹理 */
             background-image: radial-gradient(#d5cebd 1.2px, transparent 1.2px);
             background-size: 25px 25px;
             min-height: 100vh;
@@ -35,7 +34,7 @@
             position: relative;
         }
 
-        /* === 真正的图片水墨标题 === */
+        /* 使用AI DeepSeek-V4后确定改为真实图片2026-4-23*/
         .ink-title-wrap {
             display: inline-flex;
             justify-content: center;
@@ -44,7 +43,7 @@
             min-width: 350px;
             min-height: 120px;
             background-image: url('花草/downloaded-image.jpg'); 
-            background-size: 100% 100%; /* 让墨迹拉伸填满这个区域 */
+            background-size: 100% 100%; 
             background-position: center;
             background-repeat: no-repeat;
             z-index: 1;
@@ -52,7 +51,7 @@
 
         h1 {
             font-size: 2.8rem;
-            color: #ffffff; /* 墨迹上的白色文字 */
+            color: #ffffff; 
             margin: 0;
             letter-spacing: 15px;
             font-family: 'STXingkai', 'FZShuTi', 'KaiTi', serif;
@@ -81,7 +80,7 @@
             color: #fff;
         }
 
-        /* === 宣纸反馈框设计 === */
+    
         .container {
             flex: 1;
             display: flex;
@@ -152,7 +151,7 @@
             box-shadow: 0 0 10px rgba(92, 75, 65, 0.1);
         }
 
-        /* === 提交按钮样式 === */
+
         .submit-btn-container {
             text-align: center;
             margin-top: 40px;
@@ -246,7 +245,7 @@
     <script src="ai_assistant.js"></script>
     <script>
         document.getElementById('feedbackForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // 阻止页面跳转
+            e.preventDefault(); 
             const btn = document.querySelector('.submit-btn');
             const msg = document.getElementById('success-msg');
             
@@ -256,7 +255,7 @@
 
             const formData = new FormData(this);
 
-            // 使用 fetch 真实发送数据到 FormSubmit 的 AJAX 接口
+            // AI辅助生成 DeepSeek-V4电脑客户端访问，2026年4月23日 使用 fetch 真实发送数据到 FormSubmit 的 AJAX 接口
             fetch('https://formsubmit.co/ajax/547483626@qq.com', {
                 method: 'POST',
                 headers: {
